@@ -28,4 +28,4 @@ Have to fill in the blanks and make the problem as structured as possible
 
 Sot eh reqs, architecture have to be structured 
 
-show that this modality works, that someone can interact with this system and that it can store the state of the game
+show that this modality works, that someone can interact with this system and that it can store the state of the :game

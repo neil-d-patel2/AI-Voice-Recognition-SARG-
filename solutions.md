@@ -11,7 +11,7 @@ Eg.
 
 Input from announcer- "Batter struckout swinging"
 
-**RAG output** - "Batter #24 on Team Red struckout swinging. Score remains 2-3,No errors."
+**RAG output** - "Batter #24 on Team Red struckout swinging. Score remains blue 2-3,No errors."
 
 This format of RAG provides us with multiple different **solutions**:
 
