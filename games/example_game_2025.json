@@ -1,0 +1,56 @@
+{
+  "game_id": "2025-09-07_ALPB_LIDvsSMD",
+  "date": "2025-09-07",
+  "teams": {
+    "home": "Long Island Ducks",
+    "away": "Somerset Patriots"
+  },
+  "plays": [
+    {
+      "inning": 1,
+      "half": "top",
+      "batter": "Smith",
+      "action": "single",
+      "result": "Runner on first",
+      "runs_scored": 0,
+      "rule_reference": null,
+      "timestamp": "00:02:15"
+    },
+    {
+      "inning": 1,
+      "half": "top",
+      "batter": "Jones",
+      "action": "double",
+      "result": "Smith scores",
+      "runs_scored": 1,
+      "rule_reference": "Rule 5.06(b)(4): Fair ball bounding into the stands",
+      "timestamp": "00:04:10"
+    },
+    {
+      "inning": 1,
+      "half": "bottom",
+      "batter": "Johnson",
+      "action": "strikeout",
+      "result": "Two away",
+      "runs_scored": 0,
+      "rule_reference": null,
+      "timestamp": "00:08:42"
+    },
+    {
+      "inning": 2,
+      "half": "top",
+      "batter": "Brown",
+      "action": "home run",
+      "result": "Brown scores, Lee scores",
+      "runs_scored": 2,
+      "rule_reference": "Rule 5.05(a)(5): Batter becomes a runner when he hits a fair ball over the fence",
+      "timestamp": "00:13:05"
+    }
+  ],
+  "summaries": {
+    "inning_1": "Somerset Patriots take an early 1–0 lead after Jones doubles to score Smith. Johnson strikes out to end the inning.",
+    "inning_2": "Brown crushes a two-run homer, extending the Patriots’ lead to 3–0.",
+    "game": "Through two innings, Somerset leads Long Island 3–0, powered by timely hitting including a two-run shot by Brown."
+  }
+}
+
