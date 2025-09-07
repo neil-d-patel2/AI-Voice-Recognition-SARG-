@@ -1,0 +1,1 @@
+ Hello, I'm going to test if this output.mp3 file will properly read my voice. I will then see if OpenAI's whisper will properly translate my voice into text.
