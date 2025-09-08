@@ -33,4 +33,4 @@ if __name__ == "__main__":
     sample_transcript = "Smith hits a double to left field, Jones scored from second."
     play = parse_transcript_to_play(sample-transcript)
     print("Parsed JSON successfully")
-    print(play.json(indent=2))
+    print(play.json(indent=2)from)
