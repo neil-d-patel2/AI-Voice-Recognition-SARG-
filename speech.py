@@ -28,5 +28,3 @@ if __name__ == "__main__":
     text = transcribe_audio("output.mp3")
     print("Announcer said")
     print(text)
-
-    

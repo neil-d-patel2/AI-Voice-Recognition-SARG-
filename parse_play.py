@@ -5,6 +5,7 @@ from langchain_ollama.llms import OllamaLLM
 from schema import Play  # the Pydantic model above
 from pydantic import BaseModel
 
+
 # Build parser bound to the Pydantic model
 parser = PydanticOutputParser(pydantic_object=Play)
 
@@ -24,6 +25,7 @@ prompt = ChatPromptTemplate.from_messages(
 llm = OllamaLLM(model="llama3.1", temperature=0)  # temp 0 for determinism
 
 # Compose a chain that prompts, runs the model, and parses into the Pydantic model
+# LLMChain will be removed soon
 chain = prompt | llm | parser
 
 def parse_transcript(transcript_text: str):
