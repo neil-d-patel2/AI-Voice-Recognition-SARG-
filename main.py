@@ -8,7 +8,8 @@ game = GameState(home_team="Yankees", away_team="Red Sox")
 
 
 
-play_files = ["output.mp3", "abdu.mp3", "neil.mp3", "home_run.mp3"]
+play_files = ["output.mp3", "abdu.mp3", "neil.mp3", "home_run.mp3", "out.mp3", "out2.mp3", "out3.mp3"
+              ,"yankees_play1.mp3"]
 
 for plays in play_files:
      transcript = transcribe_audio(plays)

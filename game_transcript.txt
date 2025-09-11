@@ -12,6 +12,6 @@
   },
   "error": null,
   "notes": null,
-  "raw_transcript": "jones hits a home run yankees 4 red sock 0",
+  "raw_transcript": "Freeze hits a home run Yankees won Red Sox 4",
   "confidence": null
 }
