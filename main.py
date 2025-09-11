@@ -12,8 +12,18 @@ transcript = transcribe_audio("output.mp3")
 # Parse transcript → Play object
 play = parse_transcript(transcript)
 
-# Update game state
-game.update(play)
+# Preview the play before applying it
+print("=== PLAY PREVIEW ===")
+print(game.preview_play(play))
+print()
+
+# Update game state (with validation)
+try:
+    game.update(play)
+    print("✅ Play applied successfully!")
+except ValueError as e:
+    print(f"❌ Play validation failed: {e}")
+    print("Manual review required.")
 
 # Print updated state
 print("State of the Game: \n\n")
