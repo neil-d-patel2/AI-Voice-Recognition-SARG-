@@ -1,8 +1,9 @@
 # main.py
+import subprocess
 from gamestate import GameState
 from parse_play import parse_transcript
 from speech import transcribe_audio
-
+from recorder import record_audio
 # Create a game
 game = GameState(home_team="Yankees", away_team="Red Sox")
 
