@@ -2,6 +2,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_ollama.llms import OllamaLLM
+from langchain.prompts import PromptTemplate
 from schema import Play  # the Pydantic model above
 from pydantic import BaseModel
 
@@ -14,13 +15,21 @@ system_msg = (
     "You are a precise baseball scoring assistant. "
     "Given a single announcer transcript of a play, return a JSON object that exactly matches the schema below. "
 )
-prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", system_msg + "\n{format_instructions}"),
-        ("user", "{transcript}")
-    ]
-).partial(format_instructions=parser.get_format_instructions())
+prompt = PromptTemplate(
+    template="""
+You are a baseball scorekeeping assistant. 
+Return **only JSON** that matches this schema:
+{format_instructions}
 
+Important: 
+- Use lowercase literals for all bases: "none", "first", "second", "third", "home", "out"
+- Do not abbreviate or capitalize.
+
+Transcript: "{transcript}"
+""",
+    input_variables=["transcript"],
+    partial_variables={"format_instructions": parser.get_format_instructions()},
+)
 # Instantiate Ollama model (local)
 llm = OllamaLLM(model="llama3.1", temperature=0)  # temp 0 for determinism
 
