@@ -1,1 +1,28 @@
- Aaron Judd, leads off with a single to right field.
+{
+  "play_type": "single",
+  "batter": "Babe Ruth",
+  "pitcher": null,
+  "runners": [
+    {
+      "player": "Jud",
+      "start_base": "none",
+      "end_base": "second"
+    },
+    {
+      "player": "Ruth",
+      "start_base": "none",
+      "end_base": "first"
+    }
+  ],
+  "outs_made": 0,
+  "runs_scored": 0,
+  "bases_after": {
+    "first": null,
+    "second": "Jud",
+    "third": null
+  },
+  "error": null,
+  "notes": null,
+  "raw_transcript": "Babe Ruth hits a single, no outs. Jud on second, Ruth on first.",
+  "confidence": null
+}

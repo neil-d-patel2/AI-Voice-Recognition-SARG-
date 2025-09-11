@@ -7,7 +7,7 @@ from speech import transcribe_audio
 game = GameState(home_team="Yankees", away_team="Red Sox")
 
 # Example announcer transcript
-transcript = transcribe_audio("output.mp3")
+transcript = transcribe_audio("abdu.mp3")
 
 # Parse transcript → Play object
 play = parse_transcript(transcript)
@@ -31,6 +31,9 @@ print(game)
 print("\n")
 print("Play was recorded as \n\n")
 print(play.model_dump_json(indent=2))
+with open("game_transcript.txt","w") as f:
+        f.write(play.model_dump_json(indent=2))
+        f.write('\n')
 print("\n")
 print(play)
 
