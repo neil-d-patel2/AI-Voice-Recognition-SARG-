@@ -1,17 +1,1 @@
-{
-  "play_type": "home_run",
-  "batter": null,
-  "pitcher": null,
-  "runners": [],
-  "outs_made": 0,
-  "runs_scored": 1,
-  "bases_after": {
-    "first": "none",
-    "second": "none",
-    "third": "none"
-  },
-  "error": null,
-  "notes": null,
-  "raw_transcript": "Freeze hits a home run Yankees won Red Sox 4",
-  "confidence": null
-}
+ Season strikes out, out one.

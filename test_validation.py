@@ -27,7 +27,7 @@ def test_validation():
     print(game.preview_play(valid_play))
     try:
         game.update(valid_play)
-        print("✅ Valid play applied successfully!")
+        print("Valid play applied successfully!")
     except ValueError as e:
         print(f"❌ Unexpected error: {e}")
     print(f"Game state: {game}")

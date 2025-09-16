@@ -13,10 +13,7 @@ def transcribe_audio(file_path: str) -> str:
     """
 
     parse = result["text"]
-    with open("game_transcript.txt","w") as f:
-        f.write(parse)
-        f.write('\n')
-
+    
     """
     Parse from input in game_transcript.txt to intermed language
     """

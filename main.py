@@ -1,13 +1,13 @@
 # main.py
+import shutil
+import os
 import subprocess
 from gamestate import GameState
 from parse_play import parse_transcript
 from speech import transcribe_audio
 from recorder import record_audio
-# Create a game
+
 game = GameState(home_team="Yankees", away_team="Red Sox")
-
-
 
 play_files = ["output.mp3", "abdu.mp3", "neil.mp3", "home_run.mp3", "out.mp3", "out2.mp3", "out3.mp3"
               ,"yankees_play1.mp3"]
@@ -31,14 +31,11 @@ for plays in play_files:
         print("Manual review required.")
 
 # Print updated state
-     print("State of the Game: \n\n")
+     print("State of the Game: \n")
      print(game)
      print("\n")
      print("Play was recorded as \n\n")
      print(play.model_dump_json(indent=2))
-     with open("game_transcript.txt","w") as f:
-        f.write(play.model_dump_json(indent=2))
-        f.write('\n')
      print("\n")
-     print(play)
+
 
