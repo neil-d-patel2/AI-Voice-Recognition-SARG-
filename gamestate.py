@@ -5,7 +5,7 @@ import json
 from schema import Play, RunnerMovement
 
 class Bases:
-    """Track runners on bases with small helper API."""
+    """Track runners on bases"""
     def __init__(self):
         self.state: Dict[str, Optional[str]] = {"first": None, "second": None, "third": None}
 
