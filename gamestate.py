@@ -1,8 +1,36 @@
 # gamestate.py
 from typing import Optional, List, Dict, Tuple
 import json
-
 from schema import Play, RunnerMovement
+
+
+
+class BatterState:
+    def __init__(self, player_name: str):
+        self.player_name = player_name
+        self.strikes = 0
+        self.balls = 0
+        self.fouls = 0
+        self.at_bats = 0
+        self.hits = 0
+        self.runs = 0
+        self.rbis = 0
+
+    def record_pitch(self, pitch_type: str):
+        """Update count based on pitch result."""
+        if pitch_type == "strike":
+            self.strikes += 1
+        elif pitch_type == "ball":
+            self.balls += 1
+        elif pitch_type == "foul":
+            if self.strikes < 2:
+                self.strikes += 1
+        # You can extend to hit-by-pitch, etc.
+
+    def reset_count(self):
+        self.strikes = 0
+        self.balls = 0
+        self.fouls = 0
 
 class Bases:
     """Track runners on bases"""
@@ -47,7 +75,7 @@ class Inning:
     """Track inning number and half (top/bottom)."""
     def __init__(self):
         self.number: int = 1
-        self.top: bool = True  # True = top, False = bottom
+        self.top: bool = True  #False = bottom
 
     def next_half(self):
         if self.top:
@@ -93,10 +121,11 @@ class GameState:
         return self.home if self.inning.top else self.away
 
     def add_runs(self, n: int):
+        # retrieves the batting team, then adds n runs     
         self.batting_team().add_runs(n)
 
-    def record_outs(self, n: int):
-        self.outs += n
+    def record_outs(self, outs: int):
+        self.outs += outs
         # If 3 or more outs, change sides (reset outs to 0 and clear bases)
         if self.outs >= 3:
             self.change_sides()
