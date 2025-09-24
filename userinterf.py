@@ -13,6 +13,11 @@ class GameGUI(QWidget):
         self.setWindowTitle("Baseball Scoreboard")
         self.layout = QVBoxLayout()
 
+        #Undo button
+        self.undo_button = QPushButton("Undo")
+        self.undo_button.clicked.connect(self.game_state.undo_last_play)
+        self.layout.addWidget(self.undo_button)
+
         # Score label
         self.score_label = QLabel()
         self.layout.addWidget(self.score_label)
@@ -57,6 +62,10 @@ class GameGUI(QWidget):
                             QPushButton:hover {
                                 background-color: #3E6B65;
                             }
+                            QPushButton:disabled {
+                                background-color: #808080;
+                                color: #FFFFFF;
+                            }
                             """)
     def update_display(self):
         """Update all labels based on current game state."""
@@ -87,3 +96,10 @@ class GameGUI(QWidget):
         """Call after each play is applied to update UI."""
         self.update_display()
 
+    def undo_last_play(self):
+        """Undo the last play"""
+        success = self.game_state.undo_last_play()
+        if success:
+            self.update_display()
+        else:
+            print("No plays to undo")
