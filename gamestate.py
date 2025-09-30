@@ -15,8 +15,11 @@ class BatterState:
         self.runs = 0
         self.rbis = 0 
 
-    def record_pitch(self, pitch_type: str):
-        """Update count based on pitch result."""
+    def record_pitch(self, pitch_type: str) -> str:
+        """
+        Update count based on pitch result.
+        Returns the outcome: 'continue', 'walk', 'strikeout', or 'hit_by_pitch'
+        """
         if pitch_type == "strike":
             self.strikes += 1
         elif pitch_type == "ball":
@@ -24,13 +27,69 @@ class BatterState:
         elif pitch_type == "foul":
             if self.strikes < 2:
                 self.strikes += 1
-        # You can extend to hit-by-pitch, etc.
+        elif pitch_type == "hit_by_pitch":
+            return "hit_by_pitch"
+        
+        # Check for walk (4 balls)
+        if self.balls >= 4:
+            return "walk"
+        
+        # Check for strikeout (3 strikes)
+        if self.strikes >= 3:
+            return "strikeout"
+        
+        return "continue"
+
+    def is_walk(self) -> bool:
+        """Check if the current count results in a walk (4 balls)."""
+        return self.balls >= 4
+
+    def is_strikeout(self) -> bool:
+        """Check if the current count results in a strikeout (3 strikes)."""
+        return self.strikes >= 3
+
+    def get_count_status(self) -> str:
+        """
+        Get the current count status.
+        Returns: 'continue', 'walk', 'strikeout', or the count as 'B-S' format
+        """
+        if self.is_walk():
+            return "walk"
+        elif self.is_strikeout():
+            return "strikeout"
+        else:
+            return f"{self.balls}-{self.strikes}"
+
+    def should_end_at_bat(self) -> bool:
+        """Check if the at-bat should end due to walk or strikeout."""
+        return self.is_walk() or self.is_strikeout()
 
     def reset_count(self):
+        """Reset the count for a new at-bat."""
         self.strikes = 0
         self.balls = 0
         self.fouls = 0
 
+<<<<<<< HEAD
+=======
+    def start_new_at_bat(self):
+        """Start a new at-bat, incrementing at_bats counter and resetting count."""
+        self.at_bats += 1
+        self.reset_count()
+
+    def record_hit(self):
+        """Record a hit and reset count."""
+        self.hits += 1
+        self.reset_count()
+
+    def record_walk(self):
+        """Record a walk and reset count."""
+        self.reset_count()
+
+    def record_strikeout(self):
+        """Record a strikeout and reset count."""
+        self.reset_count()
+>>>>>>> f88a8d3932623ebc531a68b279890ae72156088f
 
 class Bases:
     """Track runners on bases"""
@@ -115,12 +174,39 @@ class GameState:
         self.balls: int = 0  # NEW: track balls
         self.strikes: int = 0  # NEW: track strikes
         self.history: List[Play] = []  # stores Play objects in order
+        self.current_batter: Optional[BatterState] = None
+        self.batter_stats: Dict[str, BatterState] = {}  # track all players
 
     def batting_team(self) -> Team:
         return self.away if self.inning.top else self.home
 
     def fielding_team(self) -> Team:
         return self.home if self.inning.top else self.away
+
+    def set_current_batter(self, player_name: str):
+        """Set the current batter and initialize their stats if needed."""
+        if player_name not in self.batter_stats:
+            self.batter_stats[player_name] = BatterState(player_name)
+        self.current_batter = self.batter_stats[player_name]
+        self.current_batter.start_new_at_bat()
+
+    def record_pitch(self, pitch_type: str) -> str:
+        """Record a pitch for the current batter. Returns the outcome."""
+        if not self.current_batter:
+            return "no_batter"
+        return self.current_batter.record_pitch(pitch_type)
+
+    def get_current_count(self) -> str:
+        """Get the current count for the batter at the plate."""
+        if not self.current_batter:
+            return "No batter"
+        return self.current_batter.get_count_status()
+
+    def get_current_batter_name(self) -> str:
+        """Get the name of the current batter."""
+        if not self.current_batter:
+            return "No batter"
+        return self.current_batter.player_name
 
     def add_runs(self, n: int):
         # retrieves the batting team, then adds n runs     
@@ -200,7 +286,11 @@ class GameState:
     def change_sides(self):
         self.outs = 0
         self.bases.clear()
+<<<<<<< HEAD
         self.reset_count()  # NEW: reset count on side change
+=======
+        self.current_batter = None  # Clear current batter when sides change
+>>>>>>> f88a8d3932623ebc531a68b279890ae72156088f
         self.inning.next_half()
 
     def validate_play(self, play: Play) -> Tuple[bool, str]:
