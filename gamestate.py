@@ -4,7 +4,6 @@ import json
 from schema import Play, RunnerMovement
 
 
-
 class BatterState:
     def __init__(self, player_name: str):
         self.player_name = player_name
@@ -31,6 +30,7 @@ class BatterState:
         self.strikes = 0
         self.balls = 0
         self.fouls = 0
+
 
 class Bases:
     """Track runners on bases"""
@@ -112,6 +112,8 @@ class GameState:
         self.inning = Inning()
         self.outs: int = 0
         self.bases = Bases()
+        self.balls: int = 0  # NEW: track balls
+        self.strikes: int = 0  # NEW: track strikes
         self.history: List[Play] = []  # stores Play objects in order
 
     def batting_team(self) -> Team:
@@ -124,6 +126,71 @@ class GameState:
         # retrieves the batting team, then adds n runs     
         self.batting_team().add_runs(n)
 
+    def reset_count(self):
+        """Reset the count after a batter's at-bat ends."""
+        self.balls = 0
+        self.strikes = 0
+
+    def record_pitch(self, pitch_result: str, batter_name: Optional[str] = None):
+        """
+        Record a pitch result and handle automatic walk/strikeout.
+        pitch_result: 'ball', 'strike', 'foul', 'hit', etc.
+        Returns: tuple (event_type, should_continue) where event_type is 'walk', 'strikeout', or None
+        """
+        if pitch_result == "ball":
+            self.balls += 1
+            if self.balls >= 4:
+                # Automatic walk
+                self._handle_walk(batter_name)
+                return ("walk", False)
+        elif pitch_result == "strike":
+            self.strikes += 1
+            if self.strikes >= 3:
+                # Strikeout
+                self._handle_strikeout(batter_name)
+                return ("strikeout", False)
+        elif pitch_result == "foul":
+            if self.strikes < 2:
+                self.strikes += 1
+        # For hit, play_in_progress, etc., count continues
+        return (None, True)
+
+    def _handle_walk(self, batter_name: Optional[str]):
+        """Handle a walk: force runners forward and reset count."""
+        # Check if bases are loaded or need forcing
+        first_runner = self.bases.get_runner("first")
+        second_runner = self.bases.get_runner("second")
+        third_runner = self.bases.get_runner("third")
+
+        if first_runner is None:
+            # Simple walk: batter to first
+            self.bases.move_runner("none", "first", batter_name)
+        else:
+            # Bases loaded or need to force: push runners
+            if third_runner and second_runner and first_runner:
+                # Bases loaded: third scores
+                self.add_runs(1)
+                self.bases.move_runner("third", "home", third_runner)
+                self.bases.move_runner("second", "third", second_runner)
+                self.bases.move_runner("first", "second", first_runner)
+                self.bases.move_runner("none", "first", batter_name)
+            elif second_runner and first_runner:
+                # First and second occupied
+                self.bases.move_runner("second", "third", second_runner)
+                self.bases.move_runner("first", "second", first_runner)
+                self.bases.move_runner("none", "first", batter_name)
+            else:
+                # Only first occupied
+                self.bases.move_runner("first", "second", first_runner)
+                self.bases.move_runner("none", "first", batter_name)
+
+        self.reset_count()
+
+    def _handle_strikeout(self, batter_name: Optional[str]):
+        """Handle a strikeout: record out and reset count."""
+        self.record_outs(1)
+        self.reset_count()
+
     def record_outs(self, outs: int):
         self.outs += outs
         # If 3 or more outs, change sides (reset outs to 0 and clear bases)
@@ -133,6 +200,7 @@ class GameState:
     def change_sides(self):
         self.outs = 0
         self.bases.clear()
+        self.reset_count()  # NEW: reset count on side change
         self.inning.next_half()
 
     def validate_play(self, play: Play) -> Tuple[bool, str]:
@@ -181,6 +249,7 @@ class GameState:
         preview = []
         preview.append("Play Preview:")
         preview.append(f"  Type: {play.play_type}")
+        preview.append(f"  Count: {self.balls}-{self.strikes}")
         preview.append(f"  Outs: {self.outs} → {self.outs + play.outs_made}")
         preview.append(f"  Runs (batting team): {self.batting_team().runs} → {self.batting_team().runs + play.runs_scored}")
         preview.append(f"  Current bases: {self.bases.snapshot()}")
@@ -202,6 +271,7 @@ class GameState:
                 self.bases.clear_base(base)
         # Score batter even if name missing (we increment runs for the team)
         self.add_runs(1)
+        self.reset_count()  # NEW: reset count after home run
 
     def _apply_runner_movements(self, play: Play):
         """Apply runner movements recorded in play.runners."""
@@ -236,21 +306,8 @@ class GameState:
         elif play.play_type == "triple":
             self.bases.move_runner("none", "third", play.batter)
         elif play.play_type == "walk":
-            # simple walk behavior: if first empty, batter to first; if not, push runners forward (simple logic)
-            if self.bases.get_runner("first") is None:
-                self.bases.move_runner("none", "first", play.batter)
-            else:
-                # push logic: third scores if occupied, second->third, first->second, batter->first
-                if self.bases.get_runner("third"):
-                    self.add_runs(1)
-                    self.bases.clear_base("third")
-                if self.bases.get_runner("second"):
-                    self.bases.move_runner("second", "third", self.bases.get_runner("second"))
-                    self.bases.clear_base("second")
-                if self.bases.get_runner("first"):
-                    self.bases.move_runner("first", "second", self.bases.get_runner("first"))
-                    self.bases.clear_base("first")
-                self.bases.move_runner("none", "first", play.batter)
+            # Walk handled by _handle_walk, but included here for consistency
+            self._handle_walk(play.batter)
 
     def update(self, play: Play, validate: bool = True):
         """Update state from a Play object."""
@@ -274,8 +331,16 @@ class GameState:
         self._apply_runner_movements(play)
 
         # Place batter on base for normal hits / walks
-        if play.play_type in ["single", "double", "triple", "walk"]:
+        if play.play_type in ["single", "double", "triple"]:
             self._apply_batter_on_base(play)
+            self.reset_count()  # NEW: reset count after hit
+        elif play.play_type == "walk":
+            self._apply_batter_on_base(play)
+            # Count already reset in _handle_walk
+        elif play.play_type == "strikeout":
+            self.reset_count()  # NEW: reset count after strikeout
+        elif play.play_type in ["groundout", "flyout", "lineout"]:
+            self.reset_count()  # NEW: reset count after out
 
         # Note: runs_scored field in Play can be used as an additional check (not used to drive state here).
 
@@ -309,6 +374,8 @@ class GameState:
             "away": self.away.to_dict(),
             "inning": {"number": self.inning.number, "top": self.inning.top},
             "outs": self.outs,
+            "balls": self.balls,  # NEW: persist balls
+            "strikes": self.strikes,  # NEW: persist strikes
             "bases": self.bases.snapshot(),
             "history": [p.dict() for p in self.history],
         }
@@ -326,6 +393,8 @@ class GameState:
         game.inning.number = data["inning"]["number"]
         game.inning.top = data["inning"]["top"]
         game.outs = data["outs"]
+        game.balls = data.get("balls", 0)  # NEW: restore balls
+        game.strikes = data.get("strikes", 0)  # NEW: restore strikes
         game.bases.state = data["bases"]
         # Convert history back to Play objects if possible
         for pd in data.get("history", []):
@@ -340,5 +409,6 @@ class GameState:
     def __str__(self):
         return (
             f"{self.away} | {self.home} | "
-            f"Inning: {self.inning}, Outs: {self.outs}, {self.bases}"
+            f"Inning: {self.inning}, Count: {self.balls}-{self.strikes}, "
+            f"Outs: {self.outs}, {self.bases}"
         )

@@ -21,8 +21,10 @@ You are a baseball scorekeeping assistant.
 Return **only JSON** that matches this schema:
 {format_instructions}
 
-Important: 
+Important:
 - Use lowercase literals for all bases: "none", "first", "second", "third", "home", "out"
+- Always include the batter name.
+- Always include the number of balls and strikes after the play.
 - Do not abbreviate or capitalize.
 
 Transcript: "{transcript}"

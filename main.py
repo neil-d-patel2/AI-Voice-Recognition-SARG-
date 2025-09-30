@@ -13,6 +13,8 @@ from userinterf import GameGUI, QApplication
 app = QApplication(sys.argv)
 game = GameState(home_team="Yankees", away_team="Red Sox")
 gui = GameGUI(game)
+gui.show()
+
 """
 play_files = ["output.mp3",
               "output2.mp3",
@@ -24,7 +26,7 @@ play_files = ["output.mp3",
               "yankees_play1.mp3"]
 """
 
-play_files = ["output.mp3", "output2.mp3"]
+play_files = ["play1.mp3", "play2.mp3", "play3.mp3"]
 
 for plays in play_files:
      transcript = transcribe_audio(plays)
