@@ -13,11 +13,9 @@ from userinterf import GameGUI, QApplication
 app = QApplication(sys.argv)
 game = GameState(home_team="Yankees", away_team="Red Sox")
 gui = GameGUI(game)
-gui.show()
-
 """
 play_files = ["output.mp3",
-              "abdu.mp3",
+              "output2.mp3",
               "neil.mp3",
               "home_run.mp3",
               "out.mp3",
@@ -26,7 +24,7 @@ play_files = ["output.mp3",
               "yankees_play1.mp3"]
 """
 
-play_files = ["output.mp3", "abdu.mp3"]
+play_files = ["output.mp3", "output2.mp3"]
 
 for plays in play_files:
      transcript = transcribe_audio(plays)
@@ -48,12 +46,10 @@ for plays in play_files:
         print("Manual review required.")
 
 # Print updated state
-     print("State of the Game: \n")
+     print("State of the Game: ")
      print(game)
      print("\n")
-     print("Play was recorded as \n\n")
-     print(play.model_dump_json(indent=2))
-     print("\n")
+
 
 
 sys.exit(app.exec())

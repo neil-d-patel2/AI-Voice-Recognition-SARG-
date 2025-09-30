@@ -14,7 +14,7 @@ class BatterState:
         self.at_bats = 0
         self.hits = 0
         self.runs = 0
-        self.rbis = 0
+        self.rbis = 0 
 
     def record_pitch(self, pitch_type: str):
         """Update count based on pitch result."""
