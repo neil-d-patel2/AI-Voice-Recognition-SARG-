@@ -8,10 +8,16 @@ from parse_play import parse_transcript
 from speech import transcribe_audio
 from recorder import record_audio
 from userinterf import GameGUI, QApplication
-           
+
+import warnings
+from urllib3.exceptions import NotOpenSSLWarning
+warnings.filterwarnings(
+    "ignore",
+    category=NotOpenSSLWarning
+)
 
 app = QApplication(sys.argv)
-game = GameState(home_team="Yankees", away_team="Red Sox")
+game = GameState(home_team="TEAM DR.D", away_team="TEAM TAD")
 gui = GameGUI(game)
 gui.show()
 
@@ -26,30 +32,31 @@ play_files = ["output.mp3",
               "yankees_play1.mp3"]
 """
 
-play_files = ["play1.mp3", "play2.mp3", "play3.mp3"]
+play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3"]
 
+
+''' Have a while loop that prompts for plays, 
+    append it to play files that can be printed,
+    print gui, then prompt for another play, then another play
+    until the game ends. '''
 for plays in play_files:
      transcript = transcribe_audio(plays)
-# Parse transcript → Play object
      play = parse_transcript(transcript)
-
-# Preview the play before applying it
-     print("=== PLAY PREVIEW ===")
-     print(game.preview_play(play))
      print()
 
-# Update game state (with validation)
      try:
          game.update(play)
-         print("✅ Play applied successfully!")
+         print("Play applied successfully!")
          gui.refresh_after_play(play)
      except ValueError as e:
-        print(f"❌ Play validation failed: {e}")
-        print("Manual review required.")
+        print(f"Play validation failed: {e}")
+        print("Check play")
 
-# Print updated state
+
      print("State of the Game: ")
      print(game)
+     print("\n Transcript:")
+     print(transcript)
      print("\n")
 
 

@@ -15,11 +15,8 @@ class BatterState:
         self.runs = 0
         self.rbis = 0 
 
-    def record_pitch(self, pitch_type: str) -> str:
-        """
-        Update count based on pitch result.
-        Returns the outcome: 'continue', 'walk', 'strikeout', or 'hit_by_pitch'
-        """
+    def record_pitch(self, pitch_type: str):
+        """Update count based on pitch result."""
         if pitch_type == "strike":
             self.strikes += 1
         elif pitch_type == "ball":
@@ -27,69 +24,13 @@ class BatterState:
         elif pitch_type == "foul":
             if self.strikes < 2:
                 self.strikes += 1
-        elif pitch_type == "hit_by_pitch":
-            return "hit_by_pitch"
-        
-        # Check for walk (4 balls)
-        if self.balls >= 4:
-            return "walk"
-        
-        # Check for strikeout (3 strikes)
-        if self.strikes >= 3:
-            return "strikeout"
-        
-        return "continue"
-
-    def is_walk(self) -> bool:
-        """Check if the current count results in a walk (4 balls)."""
-        return self.balls >= 4
-
-    def is_strikeout(self) -> bool:
-        """Check if the current count results in a strikeout (3 strikes)."""
-        return self.strikes >= 3
-
-    def get_count_status(self) -> str:
-        """
-        Get the current count status.
-        Returns: 'continue', 'walk', 'strikeout', or the count as 'B-S' format
-        """
-        if self.is_walk():
-            return "walk"
-        elif self.is_strikeout():
-            return "strikeout"
-        else:
-            return f"{self.balls}-{self.strikes}"
-
-    def should_end_at_bat(self) -> bool:
-        """Check if the at-bat should end due to walk or strikeout."""
-        return self.is_walk() or self.is_strikeout()
+        # You can extend to hit-by-pitch, etc.
 
     def reset_count(self):
-        """Reset the count for a new at-bat."""
         self.strikes = 0
         self.balls = 0
         self.fouls = 0
 
-<<<<<<< HEAD
-=======
-    def start_new_at_bat(self):
-        """Start a new at-bat, incrementing at_bats counter and resetting count."""
-        self.at_bats += 1
-        self.reset_count()
-
-    def record_hit(self):
-        """Record a hit and reset count."""
-        self.hits += 1
-        self.reset_count()
-
-    def record_walk(self):
-        """Record a walk and reset count."""
-        self.reset_count()
-
-    def record_strikeout(self):
-        """Record a strikeout and reset count."""
-        self.reset_count()
->>>>>>> f88a8d3932623ebc531a68b279890ae72156088f
 
 class Bases:
     """Track runners on bases"""
@@ -174,39 +115,12 @@ class GameState:
         self.balls: int = 0  # NEW: track balls
         self.strikes: int = 0  # NEW: track strikes
         self.history: List[Play] = []  # stores Play objects in order
-        self.current_batter: Optional[BatterState] = None
-        self.batter_stats: Dict[str, BatterState] = {}  # track all players
 
     def batting_team(self) -> Team:
         return self.away if self.inning.top else self.home
 
     def fielding_team(self) -> Team:
         return self.home if self.inning.top else self.away
-
-    def set_current_batter(self, player_name: str):
-        """Set the current batter and initialize their stats if needed."""
-        if player_name not in self.batter_stats:
-            self.batter_stats[player_name] = BatterState(player_name)
-        self.current_batter = self.batter_stats[player_name]
-        self.current_batter.start_new_at_bat()
-
-    def record_pitch(self, pitch_type: str) -> str:
-        """Record a pitch for the current batter. Returns the outcome."""
-        if not self.current_batter:
-            return "no_batter"
-        return self.current_batter.record_pitch(pitch_type)
-
-    def get_current_count(self) -> str:
-        """Get the current count for the batter at the plate."""
-        if not self.current_batter:
-            return "No batter"
-        return self.current_batter.get_count_status()
-
-    def get_current_batter_name(self) -> str:
-        """Get the name of the current batter."""
-        if not self.current_batter:
-            return "No batter"
-        return self.current_batter.player_name
 
     def add_runs(self, n: int):
         # retrieves the batting team, then adds n runs     
@@ -286,11 +200,7 @@ class GameState:
     def change_sides(self):
         self.outs = 0
         self.bases.clear()
-<<<<<<< HEAD
         self.reset_count()  # NEW: reset count on side change
-=======
-        self.current_batter = None  # Clear current batter when sides change
->>>>>>> f88a8d3932623ebc531a68b279890ae72156088f
         self.inning.next_half()
 
     def validate_play(self, play: Play) -> Tuple[bool, str]:
@@ -409,6 +319,21 @@ class GameState:
         # Append to history first so we have replay available
         self.history.append(play)
 
+        # Handle individual pitches (ball, strike, foul_ball)
+        if play.play_type in ["ball", "strike", "foul_ball"]:
+            # Map foul_ball to foul for record_pitch
+            pitch_type = "foul" if play.play_type == "foul_ball" else play.play_type
+            event, should_continue = self.record_pitch(pitch_type, play.batter)
+            
+            # Sync the count from Play if provided (for consistency/validation)
+            if play.balls is not None:
+                self.balls = play.balls
+            if play.strikes is not None:
+                self.strikes = play.strikes
+            
+            #print(f"Pitch: {play.play_type} | Count: {self.balls}-{self.strikes}")
+            return  # Don't process further for individual pitches
+
         # Apply outs (this may trigger side change)
         self.record_outs(play.outs_made)
 
@@ -423,14 +348,14 @@ class GameState:
         # Place batter on base for normal hits / walks
         if play.play_type in ["single", "double", "triple"]:
             self._apply_batter_on_base(play)
-            self.reset_count()  # NEW: reset count after hit
+            self.reset_count()  # Reset count after hit
         elif play.play_type == "walk":
             self._apply_batter_on_base(play)
             # Count already reset in _handle_walk
         elif play.play_type == "strikeout":
-            self.reset_count()  # NEW: reset count after strikeout
-        elif play.play_type in ["groundout", "flyout", "lineout"]:
-            self.reset_count()  # NEW: reset count after out
+            self.reset_count()  # Reset count after strikeout
+        elif play.play_type in ["ground_out", "fly_out"]:
+            self.reset_count()  # Reset count after out
 
         # Note: runs_scored field in Play can be used as an additional check (not used to drive state here).
 
@@ -497,8 +422,15 @@ class GameState:
         return game
 
     def __str__(self):
+        bases_str = []
+        for base in ["first", "second", "third"]:
+            runner = self.bases.get_runner(base)
+            if runner:
+                bases_str.append(f"{base}: {runner}")
+        bases_display = ", ".join(bases_str) if bases_str else "Bases empty"
+        
         return (
             f"{self.away} | {self.home} | "
             f"Inning: {self.inning}, Count: {self.balls}-{self.strikes}, "
-            f"Outs: {self.outs}, {self.bases}"
+            f"Outs: {self.outs} | {bases_display}"
         )
