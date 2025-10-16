@@ -8,10 +8,20 @@ def transcribe_audio(file_path: str) -> str:
     # and in doing so, make the model understand "Baseball language better"
     # can start off by creating a kvp of incorrect terms that we commonly see
     # such as basis and bases being incorrect 
-  
+    '''
+    this prompt string will be used to make sure the model expects baseball speech.
+    Along side the common mistakes that we will be appending in the future everytime we 
+    see a language error that is effecting our program, it will be a big help. 
+    
+    '''
+    
+    prompt = "Top of the third inning. Two balls, one strike, one out. Runner on first base" 
+
+
     # Transcribe audio
     result = model.transcribe(file_path, fp16=False)
-
+    
+        
     """
     Write each "Chunked text into a txt file for parsing"
     """
@@ -26,15 +36,8 @@ def transcribe_audio(file_path: str) -> str:
 
 COMMON_MISTAKES = {
     "basis": "bases",
-    "base ball": "baseball",
-    "home run": "homerun",
-    "outfield": "outfield",
-    "infield": "infield",
-    "strike out": "strikeout",
-    "double play": "doubleplay",
-    "grand slam": "grandslam",
-    "walk off": "walkoff",
-    "Neal" : "Neil"
+    "Neal" : "Neil",
+    "Mrs" : "Misses"
     # Add more common mistakes as needed
 }
 
@@ -42,6 +45,7 @@ def clean_transcript(text):
     for wrong, right in COMMON_MISTAKES.items():
         text = text.replace(wrong, right)
     return text
+
 
 if __name__ == "__main__":
     text = transcribe_audio("output.mp3")

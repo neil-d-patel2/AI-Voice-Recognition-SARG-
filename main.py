@@ -5,7 +5,7 @@ import subprocess
 import sys
 from gamestate import GameState
 from parse_play import parse_transcript
-from speech import transcribe_audio
+from speech import transcribe_audio, clean_transcript
 from recorder import record_audio
 from userinterf import GameGUI, QApplication
 
@@ -41,6 +41,7 @@ play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "
     until the game ends. '''
 for plays in play_files:
      transcript = transcribe_audio(plays)
+     transcript = clean_transcript(transcript)
      play = parse_transcript(transcript)
      print()
 
