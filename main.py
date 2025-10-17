@@ -32,7 +32,9 @@ play_files = ["output.mp3",
               "yankees_play1.mp3"]
 """
 
-play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3"]
+#play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3"]
+
+play_files = ['play1_test.mp3', 'play2_test.mp3']
 
 
 ''' Have a while loop that prompts for plays, 

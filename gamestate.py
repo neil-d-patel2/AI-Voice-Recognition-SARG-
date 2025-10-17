@@ -202,7 +202,7 @@ class GameState:
         self.bases.clear()
         self.reset_count()  # NEW: reset count on side change
         self.inning.next_half()
-
+    '''
     def validate_play(self, play: Play) -> Tuple[bool, str]:
         """
         Validate if this play makes sense given current game state.
@@ -238,7 +238,7 @@ class GameState:
                 if self.bases.get_runner(start) is None:
                     return False, f"Runner claims to start from {start} but base is empty"
 
-        return True, "Play is valid"
+        return True, "Play is valid" '''
 
     def preview_play(self, play: Play) -> str:
         """Show what would happen if this play were applied (does not mutate)."""
