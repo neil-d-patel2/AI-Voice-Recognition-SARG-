@@ -45,6 +45,11 @@ for plays in play_files:
      transcript = transcribe_audio(plays)
      transcript = clean_transcript(transcript)
      play = parse_transcript(transcript)
+     
+     print(f"DEBUG Play object: {play}")
+     print(f"DEBUG Play.batter: {play.batter}")
+     print(f"DEBUG Play.play_type: {play.play_type}")
+     print(f"DEBUG Play.runners: {play.runners}")    
      print()
 
      try:

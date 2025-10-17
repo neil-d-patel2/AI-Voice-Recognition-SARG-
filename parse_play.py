@@ -21,11 +21,29 @@ You are a baseball scorekeeping assistant.
 Return **only JSON** that matches this schema:
 {format_instructions}
 
-Important:
-- Use lowercase literals for all bases: "none", "first", "second", "third", "home", "out"
-- Always include the batter name.
-- Always include the number of balls and strikes after the play.
-- Do not abbreviate or capitalize.
+CRITICAL RULES:
+1. Use lowercase literals for all bases: "none", "first", "second", "third", "home", "out"
+2. Always include the batter name in the "batter" field
+3. Always include the number of balls and strikes after the play
+4. **IMPORTANT: The "runners" list should ONLY contain existing baserunners who are moving**
+   - DO NOT include the batter in the runners list
+   - The batter is handled separately via the "batter" field
+   - Only include runners who were already on base before the play
+5. For the batter's movement:
+   - Singles: batter field contains the name, runners list is empty (unless other runners move)
+   - Doubles: batter field contains the name, runners list is empty (unless other runners move)
+   - Triples: batter field contains the name, runners list is empty (unless other runners move)
+   - Home runs: batter field contains the name, runners list is empty
+
+EXAMPLES:
+Transcript: "Neil hits a double, he is on second base"
+Correct: batter="Neil", play_type="double", runners=[]
+
+Transcript: "Abdu hits a single, Abdu is on first, Neil moves from second to third"
+Correct: batter="Abdu", play_type="single", runners=[{{player="Neil", start_base="second", end_base="third"}}]
+
+Transcript: "Mike hits a home run, scoring Neil from first"
+Correct: batter="Mike", play_type="home_run", runners=[]
 
 Transcript: "{transcript}"
 """,
