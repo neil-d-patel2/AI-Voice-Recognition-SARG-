@@ -9,66 +9,100 @@ from pydantic import BaseModel
 # Build parser bound to the Pydantic model
 parser = PydanticOutputParser(pydantic_object=Play)
 
-# Simplified prompt with CONCRETE EXAMPLES
+# Strict prompt - ONLY accepts the standardized format
 prompt = PromptTemplate(
     template="""You are a baseball scorekeeping assistant. Parse the transcript into JSON.
 
 {format_instructions}
 
-CRITICAL PATTERN MATCHING RULES:
+REQUIRED ANNOUNCEMENT FORMAT:
+ALL transcripts MUST follow this exact pattern:
+"[Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score]."
 
-1. If transcript contains "swings" or "swings and misses" → play_type = "swinging_strike"
-2. If transcript contains "takes a ball" or "ball" (without swinging) → play_type = "ball"
-3. If transcript contains "called strike" → play_type = "called_strike"
-4. If transcript contains "foul" → play_type = "foul"
-5. If transcript contains "single" → play_type = "single"
-6. If transcript contains "double" → play_type = "double"
-7. If transcript contains "triple" → play_type = "triple"
-8. If transcript contains "home run" → play_type = "home_run"
-9. If transcript contains "out" (fly out, ground out, etc.) → play_type = "fly_out" or "ground_out"
-10. If transcript contains "strikeout" → play_type = "strikeout"
+PARSING RULES:
 
-BATTER NAME: Always extract the first name mentioned in the transcript.
+1. BATTER NAME: First word(s) before the action verb
+2. ACTION determines play_type:
+   - "swings and misses" → swinging_strike
+   - "takes a ball" → ball
+   - "called strike" → called_strike
+   - "fouls it off" or "fouls" → foul
+   - "hits a single" → single
+   - "hits a double" → double
+   - "hits a triple" → triple
+   - "hits a home run" → home_run
+   - "flies out" → fly_out
+   - "grounds out" → ground_out
+   - "lines out" → line_out
+   - "pops out" → pop_out
+   - "strikes out" → strikeout
+   - "draws a walk" or "walks" → walk
 
-COUNT: Extract "Ball X Strikes Y" pattern from transcript.
+3. COUNT: Extract from "Count: X-Y" (X = balls, Y = strikes)
 
-AT_BAT_COMPLETE:
-- False for: ball, called_strike, swinging_strike, foul
-- True for: single, double, triple, home_run, fly_out, ground_out, strikeout, walk
+4. BASE STATE: 
+   - "Bases empty" → no runners
+   - "Runner on first: [Name]" → one runner
+   - Parse multiple runners if mentioned
 
-EXAMPLES (learn from these):
+5. OUTS: Extract number from "[X] out(s)" or "No outs"
+   - This is GAME STATE (total outs), NOT what this play caused
+
+6. OUTS_MADE (what THIS play caused):
+   - Hits (single, double, triple, home_run, walk) → outs_made = 0
+   - Outs (fly_out, ground_out, strikeout, etc.) → outs_made = 1
+   - Foul, ball, strike → outs_made = 0
+
+7. AT_BAT_COMPLETE:
+   - False: ball, called_strike, swinging_strike, foul
+   - True: single, double, triple, home_run, fly_out, ground_out, line_out, pop_out, strikeout, walk
+
+EXAMPLES:
 
 Example 1:
-Input: "Neil swings, ball zero strikes 1, bases empty"
+Input: "Neil swings and misses. Count: 0-1. Bases empty. No outs. Score: 0-0."
 Output: {{"play_type": "swinging_strike", "batter": "Neil", "balls": 0, "strikes": 1, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
 
 Example 2:
-Input: "Neil takes a ball, balls one strikes one, bases empty"
-Output: {{"play_type": "ball", "batter": "Neil", "balls": 1, "strikes": 1, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+Input: "Neil takes a ball. Count: 1-0. Bases empty. No outs. Score: 0-0."
+Output: {{"play_type": "ball", "batter": "Neil", "balls": 1, "strikes": 0, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
 
 Example 3:
-Input: "Neil swings and misses, balls 1 strikes 2, bases empty"
+Input: "Neil swings and misses. Count: 1-2. Bases empty. No outs. Score: 0-0."
 Output: {{"play_type": "swinging_strike", "batter": "Neil", "balls": 1, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
 
 Example 4:
-Input: "Neil hits a single, he is on first, no outs"
+Input: "Neil hits a single. Count: 0-0. Runner on first: Neil. No outs. Score: 0-0."
 Output: {{"play_type": "single", "batter": "Neil", "balls": 0, "strikes": 0, "runners": [{{"player": "Neil", "start_base": "none", "end_base": "first"}}], "outs_made": 0, "runs_scored": 0, "at_bat_complete": true}}
 
 Example 5:
-Input: "Abdu hits a home run on the first pitch, score is 2-0. Current game state - Runners: first: Neil"
-Output: {{"play_type": "home_run", "batter": "Abdu", "balls": 0, "strikes": 0, "runners": [{{"player": "Neil", "start_base": "first", "end_base": "home"}}, {{"player": "Abdu", "start_base": "none", "end_base": "home"}}], "outs_made": 0, "runs_scored": 2, "at_bat_complete": true}}
+Input: "Terrence hits a single. Count: 0-0. Runner on first: Terrence. 1 out. Score: 2-0."
+Output: {{"play_type": "single", "batter": "Terrence", "balls": 0, "strikes": 0, "runners": [{{"player": "Terrence", "start_base": "none", "end_base": "first"}}], "outs_made": 0, "runs_scored": 0, "at_bat_complete": true}}
 
 Example 6:
-Input: "Roof swings, and he's out"
+Input: "Abdu hits a home run. Count: 0-0. Bases empty. No outs. Score: Away 2, Home 0."
+Output: {{"play_type": "home_run", "batter": "Abdu", "balls": 0, "strikes": 0, "runners": [{{"player": "Neil", "start_base": "first", "end_base": "home"}}, {{"player": "Abdu", "start_base": "none", "end_base": "home"}}], "outs_made": 0, "runs_scored": 2, "at_bat_complete": true}}
+
+Example 7:
+Input: "Roof flies out to center field. Count: 0-0. Bases empty. 1 out. Score: 2-0."
 Output: {{"play_type": "fly_out", "batter": "Roof", "balls": 0, "strikes": 0, "runners": [], "outs_made": 1, "runs_scored": 0, "at_bat_complete": true}}
+
+Example 8:
+Input: "Johnson grounds out to second base. Count: 0-0. Bases empty. 2 outs. Score: 2-0."
+Output: {{"play_type": "ground_out", "batter": "Johnson", "balls": 0, "strikes": 0, "runners": [], "outs_made": 1, "runs_scored": 0, "at_bat_complete": true}}
+
+Example 9:
+Input: "Sarah fouls it off. Count: 2-2. Runner on second: Mike. 1 out. Score: 3-1."
+Output: {{"play_type": "foul", "batter": "Sarah", "balls": 2, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
 
 NOW PARSE THIS TRANSCRIPT:
 "{transcript}"
 
-Remember:
-- "swings" means swinging_strike (NOT ball)
-- Always extract batter name
-- If it's an out, set outs_made=1 and at_bat_complete=true
+KEY REMINDERS:
+- Extract count from "Count: X-Y" format
+- Hits get outs_made = 0 (even if transcript says "1 out")
+- Outs get outs_made = 1
+- The outs mentioned in transcript = current game state, NOT this play's outs_made
 """,
     input_variables=["transcript"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
@@ -85,6 +119,6 @@ def parse_transcript(transcript_text: str):
 
 # Example use
 if __name__ == "__main__":
-    t = "Ground ball to shortstop, thrown to first, out at first."
+    t = "Neil swings and misses. Count: 1-2. Bases empty. No outs. Score: 0-0."
     play = parse_transcript(t)
     print(play.model_dump_json(indent=2))
