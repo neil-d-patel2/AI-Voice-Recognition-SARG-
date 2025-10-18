@@ -8,9 +8,9 @@ from parse_play import parse_transcript
 from speech import transcribe_audio, clean_transcript
 from recorder import record_audio
 from userinterf import GameGUI, QApplication
-
 import warnings
 from urllib3.exceptions import NotOpenSSLWarning
+
 warnings.filterwarnings(
     "ignore",
     category=NotOpenSSLWarning
@@ -31,27 +31,43 @@ play_files = ["output.mp3",
               "out3.mp3",
               "yankees_play1.mp3"]
 """
-
 #play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3"]
-
 play_files = ['play1_test.mp3', 'play2_test.mp3']
-
 
 ''' Have a while loop that prompts for plays, 
     append it to play files that can be printed,
     print gui, then prompt for another play, then another play
     until the game ends. '''
+
 for plays in play_files:
      transcript = transcribe_audio(plays)
      transcript = clean_transcript(transcript)
-     play = parse_transcript(transcript)
+     
+     # CRITICAL FIX: Pass current game state context to parser
+     # This lets the LLM know who's on base and the current count
+     current_bases = game.bases.snapshot()
+     current_count = f"{game.balls}-{game.strikes}"
+     current_outs = game.outs
+     
+     # Add context to transcript for better parsing
+     context_info = f"\nCurrent game state - Count: {current_count}, Outs: {current_outs}"
+     if any(current_bases.values()):
+         runners_info = ", ".join([f"{base}: {player}" for base, player in current_bases.items() if player])
+         context_info += f", Runners: {runners_info}"
+     else:
+         context_info += ", Bases empty"
+     
+     transcript_with_context = transcript + context_info
+     
+     # Parse the play with context
+     play = parse_transcript(transcript_with_context)
      
      print(f"DEBUG Play object: {play}")
      print(f"DEBUG Play.batter: {play.batter}")
      print(f"DEBUG Play.play_type: {play.play_type}")
      print(f"DEBUG Play.runners: {play.runners}")    
      print()
-
+     
      try:
          game.update(play)
          print("Play applied successfully!")
@@ -59,14 +75,11 @@ for plays in play_files:
      except ValueError as e:
         print(f"Play validation failed: {e}")
         print("Check play")
-
-
+     
      print("State of the Game: ")
      print(game)
      print("\n Transcript:")
      print(transcript)
      print("\n")
-
-
 
 sys.exit(app.exec())

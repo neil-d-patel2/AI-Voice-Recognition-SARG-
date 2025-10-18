@@ -3,63 +3,84 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_ollama.llms import OllamaLLM
 from langchain.prompts import PromptTemplate
-from schema import Play  # the Pydantic model above
+from schema import Play
 from pydantic import BaseModel
-
 
 # Build parser bound to the Pydantic model
 parser = PydanticOutputParser(pydantic_object=Play)
 
-# Create prompt template and inject parser instructions
-system_msg = (
-    "You are a precise baseball scoring assistant. "
-    "Given a single announcer transcript of a play, return a JSON object that exactly matches the schema below. "
-)
+# Simplified prompt with CONCRETE EXAMPLES
 prompt = PromptTemplate(
-    template="""
-You are a baseball scorekeeping assistant. 
-Return **only JSON** that matches this schema:
+    template="""You are a baseball scorekeeping assistant. Parse the transcript into JSON.
+
 {format_instructions}
 
-CRITICAL RULES:
-1. Use lowercase literals for all bases: "none", "first", "second", "third", "home", "out"
-2. Always include the batter name in the "batter" field
-3. Always include the number of balls and strikes after the play
-4. **IMPORTANT: The "runners" list should ONLY contain existing baserunners who are moving**
-   - DO NOT include the batter in the runners list
-   - The batter is handled separately via the "batter" field
-   - Only include runners who were already on base before the play
-5. For the batter's movement:
-   - Singles: batter field contains the name, runners list is empty (unless other runners move)
-   - Doubles: batter field contains the name, runners list is empty (unless other runners move)
-   - Triples: batter field contains the name, runners list is empty (unless other runners move)
-   - Home runs: batter field contains the name, runners list is empty
+CRITICAL PATTERN MATCHING RULES:
 
-EXAMPLES:
-Transcript: "Neil hits a double, he is on second base"
-Correct: batter="Neil", play_type="double", runners=[]
+1. If transcript contains "swings" or "swings and misses" → play_type = "swinging_strike"
+2. If transcript contains "takes a ball" or "ball" (without swinging) → play_type = "ball"
+3. If transcript contains "called strike" → play_type = "called_strike"
+4. If transcript contains "foul" → play_type = "foul"
+5. If transcript contains "single" → play_type = "single"
+6. If transcript contains "double" → play_type = "double"
+7. If transcript contains "triple" → play_type = "triple"
+8. If transcript contains "home run" → play_type = "home_run"
+9. If transcript contains "out" (fly out, ground out, etc.) → play_type = "fly_out" or "ground_out"
+10. If transcript contains "strikeout" → play_type = "strikeout"
 
-Transcript: "Abdu hits a single, Abdu is on first, Neil moves from second to third"
-Correct: batter="Abdu", play_type="single", runners=[{{player="Neil", start_base="second", end_base="third"}}]
+BATTER NAME: Always extract the first name mentioned in the transcript.
 
-Transcript: "Mike hits a home run, scoring Neil from first"
-Correct: batter="Mike", play_type="home_run", runners=[]
+COUNT: Extract "Ball X Strikes Y" pattern from transcript.
 
-Transcript: "{transcript}"
+AT_BAT_COMPLETE:
+- False for: ball, called_strike, swinging_strike, foul
+- True for: single, double, triple, home_run, fly_out, ground_out, strikeout, walk
+
+EXAMPLES (learn from these):
+
+Example 1:
+Input: "Neil swings, ball zero strikes 1, bases empty"
+Output: {{"play_type": "swinging_strike", "batter": "Neil", "balls": 0, "strikes": 1, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+
+Example 2:
+Input: "Neil takes a ball, balls one strikes one, bases empty"
+Output: {{"play_type": "ball", "batter": "Neil", "balls": 1, "strikes": 1, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+
+Example 3:
+Input: "Neil swings and misses, balls 1 strikes 2, bases empty"
+Output: {{"play_type": "swinging_strike", "batter": "Neil", "balls": 1, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+
+Example 4:
+Input: "Neil hits a single, he is on first, no outs"
+Output: {{"play_type": "single", "batter": "Neil", "balls": 0, "strikes": 0, "runners": [{{"player": "Neil", "start_base": "none", "end_base": "first"}}], "outs_made": 0, "runs_scored": 0, "at_bat_complete": true}}
+
+Example 5:
+Input: "Abdu hits a home run on the first pitch, score is 2-0. Current game state - Runners: first: Neil"
+Output: {{"play_type": "home_run", "batter": "Abdu", "balls": 0, "strikes": 0, "runners": [{{"player": "Neil", "start_base": "first", "end_base": "home"}}, {{"player": "Abdu", "start_base": "none", "end_base": "home"}}], "outs_made": 0, "runs_scored": 2, "at_bat_complete": true}}
+
+Example 6:
+Input: "Roof swings, and he's out"
+Output: {{"play_type": "fly_out", "batter": "Roof", "balls": 0, "strikes": 0, "runners": [], "outs_made": 1, "runs_scored": 0, "at_bat_complete": true}}
+
+NOW PARSE THIS TRANSCRIPT:
+"{transcript}"
+
+Remember:
+- "swings" means swinging_strike (NOT ball)
+- Always extract batter name
+- If it's an out, set outs_made=1 and at_bat_complete=true
 """,
     input_variables=["transcript"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
-# Instantiate Ollama model (local)
-llm = OllamaLLM(model="llama3.1", temperature=0)  # temp 0 for determinism
 
-# Compose a chain that prompts, runs the model, and parses into the Pydantic model
-# LLMChain will be removed soon
+# Increase temperature slightly for better parsing
+llm = OllamaLLM(model="llama3.1", temperature=0.1)
+
 chain = prompt | llm | parser
 
 def parse_transcript(transcript_text: str):
     result = chain.invoke({"transcript": transcript_text})
-    # result is an instance of Play
     return result
 
 # Example use
