@@ -5,7 +5,7 @@ import subprocess
 import sys
 from gamestate import GameState
 from parse_play import parse_transcript
-from speech import transcribe_audio, clean_transcript
+from speech import transcribe_audio, clean_transcript, standardize_transcript
 from recorder import record_audio
 from userinterf import GameGUI, QApplication
 import warnings
@@ -42,6 +42,7 @@ play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "
 for plays in play_files:
      transcript = transcribe_audio(plays)
      transcript = clean_transcript(transcript)
+     transcript = standardize_transcript(transcript)
      
      # CRITICAL FIX: Pass current game state context to parser
      # This lets the LLM know who's on base and the current count

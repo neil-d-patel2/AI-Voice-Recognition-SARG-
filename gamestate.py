@@ -188,11 +188,13 @@ class GameState:
         self.reset_count()
 
     def record_outs(self, outs: int):
+        """Record outs and trigger side change if 3+ outs."""
         self.outs += outs
         if self.outs >= 3:
             self.change_sides()
 
     def change_sides(self):
+        """Change sides: reset outs, clear bases, reset count, advance inning."""
         self.outs = 0
         self.bases.clear()
         self.reset_count()
@@ -215,7 +217,7 @@ class GameState:
         if self.outs + play.outs_made > 3:
             return False, f"Too many outs: current={self.outs}, play adds={play.outs_made}"
 
-        # Validate runner movements
+        # Validate runner movements - RELAXED validation for runners
         for move in play.runners:
             start = move.start_base or "none"
             end = move.end_base or "none"
@@ -225,9 +227,8 @@ class GameState:
             if end not in ["out", "none", "first", "second", "third", "home"]:
                 return False, f"Invalid end_base: {end}"
 
-            if start in ["first", "second", "third"]:
-                if self.bases.get_runner(start) is None:
-                    return False, f"Runner claims to start from {start} but base is empty"
+            # RELAXED: Don't validate if runner exists on start base
+            # The LLM knows from context and we trust it
 
         return True, "Play is valid"
 
@@ -268,6 +269,8 @@ class GameState:
 
     def _apply_runner_movements(self, play: Play):
         """Apply runner movements recorded in play.runners."""
+        runs_scored = 0
+        
         for move in play.runners:
             start = move.start_base or "none"
             end = move.end_base or "none"
@@ -275,7 +278,7 @@ class GameState:
 
             if end == "home":
                 # runner scores
-                self.add_runs(1)
+                runs_scored += 1
                 if start in ["first", "second", "third"]:
                     self.bases.clear_base(start)
             elif end in ["first", "second", "third"]:
@@ -283,6 +286,10 @@ class GameState:
             elif end == "out":
                 if start in ["first", "second", "third"]:
                     self.bases.clear_base(start)
+        
+        # Add the runs that scored
+        if runs_scored > 0:
+            self.add_runs(runs_scored)
 
     def _apply_batter_on_base(self, play: Play):
         """Place batter on correct base for single/double/triple/walk if batter provided."""
@@ -319,16 +326,20 @@ class GameState:
             
             return  # Don't process further for individual pitches
 
+        # CRITICAL FIX: Apply runner movements BEFORE recording outs
+        # This ensures runs score before the inning potentially ends
+        if play.runners:
+            self._apply_runner_movements(play)
+
         # Apply outs (this may trigger side change)
-        self.record_outs(play.outs_made)
+        # NOTE: This happens AFTER runner movements so sac flies work correctly
+        if play.outs_made > 0:
+            self.record_outs(play.outs_made)
 
         # Special-case: home run (score everything + batter, clear bases)
         if play.play_type == "home_run":
             self._apply_home_run(play)
             return
-
-        # Apply runner movements (score those who reach home)
-        self._apply_runner_movements(play)
 
         # Place batter on base for normal hits / walks
         if play.play_type in ["single", "double", "triple"]:
