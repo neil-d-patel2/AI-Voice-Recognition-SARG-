@@ -292,7 +292,7 @@ class GameState:
             self.add_runs(runs_scored)
 
     def _apply_batter_on_base(self, play: Play):
-        """Place batter on correct base for single/double/triple/walk if batter provided."""
+        """Place batter on correct base for single/double/triple if batter provided."""
         if not play.batter:
             return
         if play.play_type == "single":
@@ -301,8 +301,7 @@ class GameState:
             self.bases.move_runner("none", "second", play.batter)
         elif play.play_type == "triple":
             self.bases.move_runner("none", "third", play.batter)
-        elif play.play_type == "walk":
-            self._handle_walk(play.batter)
+        # NOTE: walk is NOT handled here - LLM provides runner movements
 
     def update(self, play: Play, validate: bool = True):
         """Update state from a Play object."""
@@ -326,7 +325,7 @@ class GameState:
             
             return  # Don't process further for individual pitches
 
-        # CRITICAL FIX: Apply runner movements BEFORE recording outs
+        # CRITICAL: Apply runner movements BEFORE recording outs
         # This ensures runs score before the inning potentially ends
         if play.runners:
             self._apply_runner_movements(play)
@@ -341,13 +340,12 @@ class GameState:
             self._apply_home_run(play)
             return
 
-        # Place batter on base for normal hits / walks
+        # Place batter on base for normal hits
+        # NOTE: Walks are handled by runner movements from LLM, not _apply_batter_on_base
         if play.play_type in ["single", "double", "triple"]:
             self._apply_batter_on_base(play)
             self.reset_count()
-        elif play.play_type == "walk":
-            self._apply_batter_on_base(play)
-        elif play.play_type in ["strikeout", "ground_out", "fly_out", "line_out", "pop_out"]:
+        elif play.play_type in ["walk", "strikeout", "ground_out", "fly_out", "line_out", "pop_out"]:
             self.reset_count()
 
     def undo_last_play(self) -> bool:
