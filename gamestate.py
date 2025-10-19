@@ -325,6 +325,12 @@ class GameState:
             
             return  # Don't process further for individual pitches
 
+        # Special-case: home run (score everything + batter, clear bases)
+        # Handle this FIRST to avoid double-counting runs
+        if play.play_type == "home_run":
+            self._apply_home_run(play)
+            return
+
         # CRITICAL: Apply runner movements BEFORE recording outs
         # This ensures runs score before the inning potentially ends
         if play.runners:
@@ -334,11 +340,6 @@ class GameState:
         # NOTE: This happens AFTER runner movements so sac flies work correctly
         if play.outs_made > 0:
             self.record_outs(play.outs_made)
-
-        # Special-case: home run (score everything + batter, clear bases)
-        if play.play_type == "home_run":
-            self._apply_home_run(play)
-            return
 
         # Place batter on base for normal hits
         # NOTE: Walks are handled by runner movements from LLM, not _apply_batter_on_base

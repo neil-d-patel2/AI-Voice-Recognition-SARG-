@@ -45,15 +45,20 @@ CRITICAL PARSING RULES:
    - For HITS: Batter goes from "none" to base (first/second/third)
    - For HITS with runners: Advance runners based on hit type:
      * Single: runners advance 1 base (first→second, second→third, third→home)
-     * Double: runners advance 2 bases (first→third, second→home, third→home)
+     * Double: runners advance 2+ bases (first→third or home, second→home, third→home)
      * Triple: ALL runners score (→home)
-     * Home run: ALL runners score including batter
-   - For FLY OUTS with runner on third: Runner tags and scores (third→home), runs_scored=1
-   - For other outs: No runner movements unless forced
+     * Home run: ALL runners score including batter (→home)
+   - For OUTS (fly_out, ground_out, line_out, pop_out, strikeout):
+     * Usually NO runner movements (runners array empty)
+     * EXCEPTION: If runner on third AND fly_out → runner scores (third→home), runs_scored=1
+     * This is called a "sacrifice fly"
+   - For WALKS: Batter to first (none→first)
 
-5. OUTS_MADE:
-   - Hits/Walks/Pitches → outs_made = 0
-   - Any out (fly_out, ground_out, strikeout) → outs_made = 1
+5. OUTS_MADE - SIMPLE RULE:
+   - Pitches (ball, called_strike, swinging_strike, foul) → outs_made = 0
+   - Hits/Walks → outs_made = 0
+   - ANY out (fly_out, ground_out, line_out, pop_out, strikeout) → outs_made = 1
+   - CRITICAL: Foul balls ALWAYS outs_made = 0 (even if transcript says "2 out")
 
 6. RUNS_SCORED:
    - Count runners with end_base="home"
@@ -92,22 +97,26 @@ Output: {{"play_type": "double", "batter": "Sarah", "balls": 0, "strikes": 0, "r
 Example 7:
 Input: "DeAndre flies out two center field, Count, zero, zero, Runner on second: Sarah 2 out, Score: 3-0. Current game state - Count: 0-0, Outs: 2, Runners: second: Sarah, third: Rodriguez"
 Output: {{"play_type": "fly_out", "batter": "DeAndre", "balls": 0, "strikes": 0, "runners": [{{"player": "Rodriguez", "start_base": "third", "end_base": "home"}}], "outs_made": 1, "runs_scored": 1, "at_bat_complete": true}}
+NOTE: On a fly out, ONLY the runner on third (Rodriguez) tags and scores. Sarah on second stays put (no movement for her).
 
 Example 8:
-Input: "Chen grounds out two shortstwop, count, zero-zero, Bases empty 1 out, Score: 2-0. Current game state - Count: 0-1, Outs: 0, Bases empty"
-Output: {{"play_type": "ground_out", "batter": "Chen", "balls": 0, "strikes": 0, "runners": [], "outs_made": 1, "runs_scored": 0, "at_bat_complete": true}}
+Input: "Tommy Thalsedoff, Count, Zero, Two, Runner on Second: Sarah, 2 out, Score, Three-zero. Current game state - Count: 0-1, Outs: 2, Bases empty"
+Output: {{"play_type": "foul", "batter": "Tommy Thalsedoff", "balls": 0, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+NOTE: This is a FOUL ball, NOT an out. The "2 out" in transcript is game state. Fouls ALWAYS have outs_made=0.
 
 Example 9:
-Input: "Tommy called strike. count, zero one, Runner on second: Sarah 2 out, score, three zero. Current game state - Count: 0-0, Outs: 0, Bases empty"
-Output: {{"play_type": "called_strike", "batter": "Tommy", "balls": 0, "strikes": 1, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+Input: "Chen grounds out two shortstwop, count, zero-zero, Bases empty 1 out, Score: 2-0. Current game state - Count: 0-1, Outs: 0, Bases empty"
+Output: {{"play_type": "ground_out", "batter": "Chen", "balls": 0, "strikes": 0, "runners": [], "outs_made": 1, "runs_scored": 0, "at_bat_complete": true}}
+NOTE: All outs work the same: outs_made=1, no runners (unless sac fly).
 
 NOW PARSE THIS TRANSCRIPT:
 "{transcript}"
 
 KEY REMINDERS:
 - Extract count from "Count: X-Y" format
-- Hits get outs_made = 0 (even if transcript says "1 out")
-- Outs get outs_made = 1
+- All outs get outs_made = 1 and usually empty runners array
+- EXCEPTION: Fly out with runner on third → runner scores (sac fly)
+- Fouls ALWAYS get outs_made = 0
 - The outs mentioned in transcript = current game state, NOT this play's outs_made
 """,
     input_variables=["transcript"],
