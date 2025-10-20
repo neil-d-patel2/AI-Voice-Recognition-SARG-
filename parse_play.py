@@ -8,7 +8,8 @@ from pydantic import BaseModel
 
 # Build parser bound to the Pydantic model
 parser = PydanticOutputParser(pydantic_object=Play)
-
+#The comment we use here may change after updating the quality of the llm
+#We want to pivot to gpt-4 mini in the future
 # Strict prompt - ONLY accepts the standardized format
 prompt = PromptTemplate(
     template="""You are a baseball scorekeeping assistant. Parse the transcript into JSON.
@@ -37,8 +38,10 @@ CRITICAL PARSING RULES:
    - "strikes out" → strikeout
    - "draws a walk" or "walks" → walk
 
-3. COUNT: Extract numbers from "Count: X-Y" or "count, X-Y" or "count, zero zero"
+3. COUNT: Extract numbers from "Count: X-Y" or "count, X-Y" or "count, X Y"
    - Convert word numbers: zero→0, one→1, two→2, three→3
+   - Format is ALWAYS balls-strikes (first number = balls, second number = strikes)
+   - Example: "count, zero one" = balls: 0, strikes: 1
 
 4. RUNNERS - THIS IS CRITICAL:
    - ALWAYS check "Current game state" for who's on base BEFORE the play
@@ -87,27 +90,27 @@ Input: "Jessica hits a home run. count, zero-zero, Bases empty, No outs, score, 
 Output: {{"play_type": "home_run", "batter": "Jessica", "balls": 0, "strikes": 0, "runners": [{{"player": "Marcus", "start_base": "first", "end_base": "home"}}, {{"player": "Jessica", "start_base": "none", "end_base": "home"}}], "outs_made": 0, "runs_scored": 2, "at_bat_complete": true}}
 
 Example 5:
+Input: "Chen fouls it off. count, zero one, Bases empty, No outs, Score: 2-0. Current game state - Count: 0-0, Outs: 0, Bases empty"
+Output: {{"play_type": "foul", "batter": "Chen", "balls": 0, "strikes": 1, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+NOTE: "count, zero one" means 0 balls, 1 strike (balls-strikes format).
+
+Example 6:
 Input: "Rodriguez draws a walk. count, zero zero, Runner on first: Rodriguez 1 out, Score: 2-0. Current game state - Count: 0-0, Outs: 1, Bases empty"
 Output: {{"play_type": "walk", "batter": "Rodriguez", "balls": 0, "strikes": 0, "runners": [{{"player": "Rodriguez", "start_base": "none", "end_base": "first"}}], "outs_made": 0, "runs_scored": 0, "at_bat_complete": true}}
 
-Example 6:
+Example 7:
 Input: "Sarah hits a double. count, zero-zero, Runner on second: Sarah, third, Rodriguez 1 out, score, 2-0. Current game state - Count: 0-0, Outs: 1, Runners: first: Rodriguez"
 Output: {{"play_type": "double", "batter": "Sarah", "balls": 0, "strikes": 0, "runners": [{{"player": "Rodriguez", "start_base": "first", "end_base": "third"}}, {{"player": "Sarah", "start_base": "none", "end_base": "second"}}], "outs_made": 0, "runs_scored": 0, "at_bat_complete": true}}
 
-Example 7:
+Example 8:
 Input: "DeAndre flies out two center field, Count, zero, zero, Runner on second: Sarah 2 out, Score: 3-0. Current game state - Count: 0-0, Outs: 2, Runners: second: Sarah, third: Rodriguez"
 Output: {{"play_type": "fly_out", "batter": "DeAndre", "balls": 0, "strikes": 0, "runners": [{{"player": "Rodriguez", "start_base": "third", "end_base": "home"}}], "outs_made": 1, "runs_scored": 1, "at_bat_complete": true}}
 NOTE: On a fly out, ONLY the runner on third (Rodriguez) tags and scores. Sarah on second stays put (no movement for her).
 
-Example 8:
+Example 9:
 Input: "Tommy Thalsedoff, Count, Zero, Two, Runner on Second: Sarah, 2 out, Score, Three-zero. Current game state - Count: 0-1, Outs: 2, Bases empty"
 Output: {{"play_type": "foul", "batter": "Tommy Thalsedoff", "balls": 0, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
 NOTE: This is a FOUL ball, NOT an out. The "2 out" in transcript is game state. Fouls ALWAYS have outs_made=0.
-
-Example 9:
-Input: "Chen grounds out two shortstwop, count, zero-zero, Bases empty 1 out, Score: 2-0. Current game state - Count: 0-1, Outs: 0, Bases empty"
-Output: {{"play_type": "ground_out", "batter": "Chen", "balls": 0, "strikes": 0, "runners": [], "outs_made": 1, "runs_scored": 0, "at_bat_complete": true}}
-NOTE: All outs work the same: outs_made=1, no runners (unless sac fly).
 
 NOW PARSE THIS TRANSCRIPT:
 "{transcript}"
