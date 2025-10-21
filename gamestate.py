@@ -320,9 +320,11 @@ class GameState:
             
             # Sync the count from Play if provided (override with LLM's count)
             if play.balls is not None:
-                self.balls = play.balls
-            if play.strikes is not None:
-                self.strikes = play.strikes
+            # don't accept impossible ball counts; keep the larger sensible value
+                self.balls = max(self.balls, min(play.balls, 3))
+                if play.strikes is not None:
+                    # cap strikes at 2 (foul should not make 3), prefer higher but never >2
+                    self.strikes = max(self.strikes, min(play.strikes, 2)) 
             
             return  # Don't process further for individual pitches
 

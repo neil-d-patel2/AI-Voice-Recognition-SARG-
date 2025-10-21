@@ -45,6 +45,7 @@ COMMON_MISTAKES = {
     "nil-nil": "zero-zero",
     "Nil-Nil": "zero-zero",
     "0-0": "zero-zero",
+    "no-no": "zero-zero"
     # Add more common mistakes as needed
 }
 
