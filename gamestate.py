@@ -72,6 +72,7 @@ class Bases:
 
 class Inning:
     """Track inning number and half (top/bottom)."""
+    #
     def __init__(self):
         self.number: int = 1
         self.top: bool = True  #False = bottom
