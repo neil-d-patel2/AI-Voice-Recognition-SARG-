@@ -83,4 +83,28 @@ for plays in play_files:
      print(transcript)
      print("\n")
 
+
+
+print(f"\nBefore undo:")
+print(f"  State: {game}")
+print(f"  History length: {len(game.history)}")
+print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by {game.history[-1].batter if game.history else 'None'}")
+
+# Undo the last play (Tommy's strikeout)
+if game.undo_last_play():
+    print(f"\nAfter undo:")
+    print(f"  State: {game}")
+    print(f"  History length: {len(game.history)}")
+    print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by {game.history[-1].batter if game.history else 'None'}")
+    
+    # Refresh GUI to show the undone state
+    gui.update_display()
+    
+    print("\n✅ Undo successful! Game should now show Tommy's foul ball as the last play.")
+    print("   Score should still be 3-0, Top 1, 2 outs, Sarah on second, Count 0-2")
+else:
+    print("\n❌ Undo failed - no history to undo")
+
+print("="*60 + "\n")
+
 sys.exit(app.exec())
