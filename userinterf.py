@@ -12,10 +12,31 @@ class GameGUI(QWidget):
         self.setWindowTitle("Baseball Scoreboard")
         self.layout = QVBoxLayout()
 
-        # Undo button
-        self.undo_button = QPushButton("Undo")
+        # Undo button and history section
+        undo_section = QVBoxLayout()
+        
+        self.undo_button = QPushButton("Undo Last Play")
         self.undo_button.clicked.connect(self.undo_last_play)
-        self.layout.addWidget(self.undo_button)
+        undo_section.addWidget(self.undo_button)
+        
+        # Visual history of last 3 plays
+        self.history_label = QLabel("Recent Plays:")
+        self.history_label.setStyleSheet("font-weight: bold; font-size: 14px; margin-top: 10px;")
+        undo_section.addWidget(self.history_label)
+        
+        self.play_history_display = QLabel("No plays yet")
+        self.play_history_display.setStyleSheet("""
+            background-color: #404040;
+            border: 2px solid #3E6B65;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: normal;
+        """)
+        self.play_history_display.setWordWrap(True)
+        undo_section.addWidget(self.play_history_display)
+        
+        self.layout.addLayout(undo_section)
 
         # Score label
         self.score_label = QLabel()
@@ -147,18 +168,47 @@ class GameGUI(QWidget):
         else:
             batter_name = "None"
         self.batter_label.setText(f"Batter: {batter_name}")
+        
+        # Update play history display
+        self.update_play_history()
 
     def refresh_after_play(self, play):
         """Call after each play is applied to update UI."""
         self.update_display()
 
+    def update_play_history(self):
+        """Update the visual display of recent plays."""
+        plays = self.game_state.get_last_n_plays(3)
+        history_text = "\n".join(plays)
+        self.play_history_display.setText(history_text)
+    
     def undo_last_play(self):
-        """Undo the last play"""
-        success = self.game_state.undo_last_play()
-        if success:
-            self.update_display()
-        else:
+        """Undo the last play with confirmation dialog."""
+        # Check if there are plays to undo
+        if not self.game_state.history:
             QMessageBox.information(self, "Undo", "No plays to undo")
+            return
+        
+        # Get the last play description for the confirmation message
+        last_play_info = self.game_state.get_last_n_plays(1)[0] if self.game_state.history else "Unknown play"
+        
+        # Show confirmation dialog
+        reply = QMessageBox.question(
+            self,
+            "Confirm Undo",
+            f"Are you sure you want to undo:\n\n{last_play_info}\n\nThis will revert the game state.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No  # Default to No for safety
+        )
+        
+        # If user confirms, perform undo
+        if reply == QMessageBox.Yes:
+            success = self.game_state.undo_last_play()
+            if success:
+                self.update_display()
+                QMessageBox.information(self, "Undo Successful", "Play has been undone.")
+            else:
+                QMessageBox.warning(self, "Undo Failed", "Failed to undo play.")
 
     def set_current_batter(self):
         """Set the current batter from the input field."""

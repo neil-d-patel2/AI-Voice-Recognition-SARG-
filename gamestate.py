@@ -364,14 +364,64 @@ class GameState:
         removed = self.history.pop()
         home_name = self.home.name
         away_name = self.away.name
+        history_to_replay = list(self.history)  # Save history BEFORE reset
         
         self.__init__(home_team=home_name, away_team=away_name)
         
-        for p in list(self.history):
+        for p in history_to_replay:  # Replay from saved list
             self.update(p, validate=False)
 
         print(f"UNDO: removed play {removed.play_type}")
         return True
+    
+    def get_last_n_plays(self, n: int = 3) -> List[str]:
+        """Get a formatted list of the last N plays for display."""
+        if not self.history:
+            return ["No plays yet"]
+        
+        last_plays = self.history[-n:]
+        formatted = []
+        for i, play in enumerate(reversed(last_plays), 1):
+            play_desc = self._format_play_description(play)
+            formatted.append(f"{i}. {play_desc}")
+        
+        return formatted
+    
+    def _format_play_description(self, play: Play) -> str:
+        """Format a play into a human-readable description."""
+        desc_parts = []
+        
+        # Batter name
+        if play.batter:
+            desc_parts.append(play.batter)
+        
+        # Play type with friendly names
+        play_type_map = {
+            "ball": "Ball",
+            "called_strike": "Called Strike",
+            "swinging_strike": "Swinging Strike",
+            "foul": "Foul",
+            "single": "Single",
+            "double": "Double",
+            "triple": "Triple",
+            "home_run": "Home Run",
+            "ground_out": "Ground Out",
+            "fly_out": "Fly Out",
+            "line_out": "Line Out",
+            "pop_out": "Pop Out",
+            "strikeout": "Strikeout",
+            "walk": "Walk",
+        }
+        play_desc = play_type_map.get(play.play_type, play.play_type.replace("_", " ").title())
+        desc_parts.append(play_desc)
+        
+        # Add runs/outs info if relevant
+        if play.runs_scored > 0:
+            desc_parts.append(f"({play.runs_scored} run{'s' if play.runs_scored > 1 else ''})")
+        if play.outs_made > 0:
+            desc_parts.append(f"({play.outs_made} out{'s' if play.outs_made > 1 else ''})")
+        
+        return " - ".join(desc_parts)
 
     def to_json(self, path: str = "gamestate.json"):
         """Persist current game state and history to disk."""
