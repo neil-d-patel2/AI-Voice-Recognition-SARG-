@@ -317,7 +317,11 @@ class GameState:
         if play.play_type in ["ball", "called_strike", "swinging_strike", "foul"]:
             pitch_type = play.play_type
             event, should_continue = self.record_pitch(pitch_type, play.batter)
-            
+            if play.balls is not None and play.balls != self.balls:
+                print(f"[DEBUG] ⚾ LLM balls={play.balls} ≠ internal={self.balls} ({pitch_type})")
+
+            if play.strikes is not None and play.strikes != self.strikes:
+                print(f"[DEBUG] ⚾ LLM strikes={play.strikes} ≠ internal={self.strikes} ({pitch_type})") 
             # Sync the count from Play if provided (override with LLM's count)
             if play.balls is not None:
             # don't accept impossible ball counts; keep the larger sensible value
