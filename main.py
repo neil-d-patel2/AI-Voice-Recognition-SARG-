@@ -44,6 +44,16 @@ for plays in play_files:
      transcript = clean_transcript(transcript)
      transcript = standardize_transcript(transcript)
      
+     if "undo" in transcript.lower():
+        print("🔄 UNDO command detected!")
+        if game.undo_last_play():
+             print("✅ Successfully undid last play")
+             gui.update_display()
+        else:
+             print("❌ No plays to undo")
+        continue
+    
+     # Skip to next audio file 
      # CRITICAL FIX: Pass current game state context to parser
      # This lets the LLM know who's on base and the current count
      current_bases = game.bases.snapshot()
