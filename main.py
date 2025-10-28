@@ -31,7 +31,7 @@ play_files = ["output.mp3",
               "out3.mp3",
               "yankees_play1.mp3"]
 """
-play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3", "play7.mp3", "play8.mp3", "play9.mp3", "play10.mp3", "play11.mp3", "play12.mp3"]
+play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3"]
 #play_files = ['play1_test.mp3', 'play2_test.mp3']
 
 ''' Have a while loop that prompts for plays, 
@@ -95,13 +95,13 @@ for plays in play_files:
 
 
 
-print(f"\nBefore undo:")
+'''print(f"\nBefore undo:")
 print(f"  State: {game}")
 print(f"  History length: {len(game.history)}")
 print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by {game.history[-1].batter if game.history else 'None'}")
-
+'''
 # Undo the last play (Tommy's strikeout)
-if game.undo_last_play():
+'''if game.undo_last_play():
     print(f"\nAfter undo:")
     print(f"  State: {game}")
     print(f"  History length: {len(game.history)}")
@@ -109,11 +109,7 @@ if game.undo_last_play():
     
     # Refresh GUI to show the undone state
     gui.update_display()
-    
-    print("\n✅ Undo successful! Game should now show Tommy's foul ball as the last play.")
-    print("   Score should still be 3-0, Top 1, 2 outs, Sarah on second, Count 0-2")
-else:
-    print("\n❌ Undo failed - no history to undo")
+'''
 
 print("="*60 + "\n")
 
