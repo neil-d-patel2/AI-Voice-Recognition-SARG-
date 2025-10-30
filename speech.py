@@ -49,7 +49,8 @@ COMMON_MISTAKES = {
     "zerol": "zero",
     "intwo": "into",
     "two shortstwop": "to shortstop",
-    "zero-zero": "0-0",# Add more common mistakes as needed
+    "zero-zero": "0-0",
+    "two short stwop": "to shortstop"
 }
 
 
