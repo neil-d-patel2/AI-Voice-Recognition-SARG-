@@ -423,7 +423,8 @@ class GameState:
         }
         play_desc = play_type_map.get(play.play_type, play.play_type.replace("_", " ").title())
         
-        # Add hit type if available
+        # Add hit type and location if available
+        extra_info = []
         if hasattr(play, 'hit_type') and play.hit_type:
             hit_type_map = {
                 "ground_ball": "GB",
@@ -433,7 +434,33 @@ class GameState:
                 "bunt": "BNT"
             }
             hit_abbrev = hit_type_map.get(play.hit_type, play.hit_type)
-            play_desc = f"{play_desc} ({hit_abbrev})"
+            extra_info.append(hit_abbrev)
+        
+        if hasattr(play, 'hit_location') and play.hit_location:
+            location_map = {
+                "pitcher": "P",
+                "catcher": "C",
+                "first_base": "1B",
+                "second_base": "2B",
+                "third_base": "3B",
+                "shortstop": "SS",
+                "left_field": "LF",
+                "center_field": "CF",
+                "right_field": "RF",
+                "left_center": "LC",
+                "right_center": "RC",
+                "shallow_left": "SL",
+                "shallow_center": "SC",
+                "shallow_right": "SR",
+                "deep_left": "DL",
+                "deep_center": "DC",
+                "deep_right": "DR"
+            }
+            location_abbrev = location_map.get(play.hit_location, play.hit_location)
+            extra_info.append(f"to {location_abbrev}")
+        
+        if extra_info:
+            play_desc = f"{play_desc} ({' '.join(extra_info)})"
         
         desc_parts.append(play_desc)
         

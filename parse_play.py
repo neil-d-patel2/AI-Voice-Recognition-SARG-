@@ -39,6 +39,33 @@ CRITICAL PARSING RULES:
    - "grounds into a double play" or "double play" → double_play
    - "hit by pitch" → hit_by_pitch
 
+2b. HIT_TYPE & HIT_LOCATION (OPTIONAL - only set if mentioned in transcript):
+   HIT_TYPE - Type of contact:
+   - "ground ball", "groundball", "grounder", "grounds" → ground_ball
+   - "fly ball", "flyball", "fly", "flies" → fly_ball
+   - "line drive", "liner", "lines" → line_drive
+   - "pop up", "popup", "pops" → popup
+   - "bunt" → bunt
+   
+   HIT_LOCATION - Where the ball was fielded:
+   - "to pitcher", "to the pitcher" → pitcher
+   - "to catcher" → catcher
+   - "to first", "first base", "first baseman" → first_base
+   - "to second", "second base", "second baseman" → second_base
+   - "to third", "third base", "third baseman" → third_base
+   - "to short", "shortstop", "to the shortstop" → shortstop
+   - "left field", "to left", "left fielder" → left_field
+   - "center field", "to center", "center fielder" → center_field
+   - "right field", "to right", "right fielder" → right_field
+   - "left center" → left_center
+   - "right center" → right_center
+   - "deep left", "deep to left" → deep_left
+   - "deep center", "deep to center" → deep_center
+   - "deep right", "deep to right" → deep_right
+   - "shallow left" → shallow_left
+   - "shallow center" → shallow_center
+   - "shallow right" → shallow_right
+
 3. COUNT: Extract numbers from "Count: X-Y" or "count, X-Y" or "count, X Y"
    - Convert word numbers: zero→0, one→1, two→2, three→3
    - Format is ALWAYS balls-strikes (first number = balls, second number = strikes)
@@ -120,6 +147,19 @@ Example 9:
 Input: "Tommy Thalsedoff, Count, Zero, Two, Runner on Second: Sarah, 2 out, Score, Three-zero. Current game state - Count: 0-1, Outs: 2, Bases empty"
 Output: {{"play_type": "foul", "batter": "Tommy Thalsedoff", "balls": 0, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
 NOTE: This is a FOUL ball, NOT an out. The "2 out" in transcript is game state. Fouls ALWAYS have outs_made=0.
+
+Example 10:
+Input: "James grounds out to shortstop. Count, zero zero, Bases empty, 1 out, Score: 2-1. Current game state - Count: 0-0, Outs: 0, Bases empty"
+Output: {{"play_type": "ground_out", "batter": "James", "balls": 0, "strikes": 0, "hit_type": "ground_ball", "hit_location": "shortstop", "runners": [], "outs_made": 1, "runs_scored": 0, "at_bat_complete": true}}
+
+Example 11:
+Input: "Maria hits a line drive to center field for a double. Count, zero zero, Runner on second: Maria, No outs, Score: 2-1. Current game state - Count: 1-2, Outs: 0, Bases empty"
+Output: {{"play_type": "double", "batter": "Maria", "balls": 0, "strikes": 0, "hit_type": "line_drive", "hit_location": "center_field", "runners": [{{"player": "Maria", "start_base": "none", "end_base": "second"}}], "outs_made": 0, "runs_scored": 0, "at_bat_complete": true}}
+
+Example 12:
+Input: "Carlos grounds into a double play to second base. Count, zero zero, Bases empty, 2 out, Score: 3-1. Current game state - Count: 2-2, Outs: 0, Runners: first: Mike"
+Output: {{"play_type": "double_play", "batter": "Carlos", "balls": 0, "strikes": 0, "hit_type": "ground_ball", "hit_location": "second_base", "runners": [{{"player": "Mike", "start_base": "first", "end_base": "out"}}, {{"player": "Carlos", "start_base": "none", "end_base": "out"}}], "outs_made": 2, "runs_scored": 0, "at_bat_complete": true}}
+NOTE: Double plays MUST have outs_made = 2.
 
 NOW PARSE THIS TRANSCRIPT:
 "{transcript}"

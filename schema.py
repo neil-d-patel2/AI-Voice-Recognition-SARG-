@@ -65,6 +65,18 @@ class Play(BaseModel):
         description="Type of contact made (e.g., ground ball, fly ball, line drive, popup, bunt)"
     )
     
+    # Hit location/direction (where the ball was fielded)
+    hit_location: Optional[Literal[
+        "pitcher", "catcher", "first_base", "second_base", "third_base", "shortstop",
+        "left_field", "center_field", "right_field",
+        "left_center", "right_center",
+        "shallow_left", "shallow_center", "shallow_right",
+        "deep_left", "deep_center", "deep_right"
+    ]] = Field(
+        None, 
+        description="Fielding position or direction where ball was hit (e.g., shortstop, center field, deep left)"
+    )
+    
     # Count information (present after pitch-type plays)
     balls: Optional[int] = Field(None, description="Balls in count after this play (0-4)")
     strikes: Optional[int] = Field(None, description="Strikes in count after this play (0-3)")
