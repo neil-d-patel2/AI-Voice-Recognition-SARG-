@@ -19,7 +19,13 @@ class Play(BaseModel):
     2. A completed at-bat result (hit, out, walk, etc.) - ends at-bat and resets count
     3. Other game events (stolen base, substitution, etc.)
     """
-    
+    hit_type: Optional[Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt"]] = Field(
+        None, description="Type of contact made (ground ball, fly ball, line drive, popup, bunt)"
+    )
+    hit_direction: Optional[str] = Field(
+        None, description="Direction of hit (e.g., 'to shortstop', 'to center field')"
+    ) 
+
     play_type: Literal[
         # Individual pitch results (at_bat_complete = False)
         "ball",              # Pitch outside zone, no swing

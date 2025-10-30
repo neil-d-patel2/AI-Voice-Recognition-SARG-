@@ -16,7 +16,6 @@ class BatterState:
         self.rbis = 0 
 
     def record_pitch(self, pitch_type: str):
-        """Update count based on pitch result."""
         if pitch_type in ["swinging_strike", "called_strike"]:
             self.strikes += 1
         elif pitch_type == "ball":
@@ -32,7 +31,6 @@ class BatterState:
 
 
 class Bases:
-    """Track runners on bases"""
     def __init__(self):
         self.state: Dict[str, Optional[str]] = {"first": None, "second": None, "third": None}
 
@@ -47,21 +45,11 @@ class Bases:
         return self.state.get(base)
 
     def move_runner(self, start: str, end: str, player: Optional[str]):
-        """
-        Move a runner from start -> end. player may be None (if unknown).
-        start can be "none" meaning a new runner (e.g. batter).
-        end can be "out" to remove the runner.
-        """
         if start in self.state and start != "none":
-            # remove runner from their start base (if present)
             self.state[start] = None
 
         if end in ["first", "second", "third"] and player is not None:
             self.state[end] = player
-
-        if end == "none":
-            # explicit 'none' means runner ended up off bases but not scored (rare)
-            pass
 
     def snapshot(self) -> Dict[str, Optional[str]]:
         return dict(self.state)
@@ -71,11 +59,9 @@ class Bases:
 
 
 class Inning:
-    """Track inning number and half (top/bottom)."""
-    #
     def __init__(self):
         self.number: int = 1
-        self.top: bool = True  #False = bottom
+        self.top: bool = True
 
     def next_half(self):
         if self.top:
@@ -89,7 +75,6 @@ class Inning:
 
 
 class Team:
-    """Track team name and score."""
     def __init__(self, name: str):
         self.name: str = name
         self.runs: int = 0
@@ -105,7 +90,6 @@ class Team:
 
 
 class GameState:
-    """Main game state tracker. Designed to be replayable and persistable."""
     def __init__(self, home_team: str, away_team: str):
         self.home = Team(home_team)
         self.away = Team(away_team)
@@ -126,26 +110,18 @@ class GameState:
         self.batting_team().add_runs(n)
 
     def reset_count(self):
-        """Reset the count after a batter's at-bat ends."""
         self.balls = 0
         self.strikes = 0
 
     def record_pitch(self, pitch_result: str, batter_name: Optional[str] = None):
-        """
-        Record a pitch result and handle automatic walk/strikeout.
-        pitch_result: 'ball', 'called_strike', 'swinging_strike', 'foul', etc.
-        Returns: tuple (event_type, should_continue) where event_type is 'walk', 'strikeout', or None
-        """
         if pitch_result == "ball":
             self.balls += 1
             if self.balls >= 4:
-                # Automatic walk
                 self._handle_walk(batter_name)
                 return ("walk", False)
         elif pitch_result in ["called_strike", "swinging_strike"]:
             self.strikes += 1
             if self.strikes >= 3:
-                # Strikeout
                 self._handle_strikeout(batter_name)
                 return ("strikeout", False)
         elif pitch_result == "foul":
@@ -154,58 +130,45 @@ class GameState:
         return (None, True)
 
     def _handle_walk(self, batter_name: Optional[str]):
-        """Handle a walk: force runners forward and reset count."""
         first_runner = self.bases.get_runner("first")
         second_runner = self.bases.get_runner("second")
         third_runner = self.bases.get_runner("third")
 
         if first_runner is None:
-            # Simple walk: batter to first
             self.bases.move_runner("none", "first", batter_name)
         else:
-            # Bases loaded or need to force: push runners
             if third_runner and second_runner and first_runner:
-                # Bases loaded: third scores
                 self.add_runs(1)
                 self.bases.move_runner("third", "home", third_runner)
                 self.bases.move_runner("second", "third", second_runner)
                 self.bases.move_runner("first", "second", first_runner)
                 self.bases.move_runner("none", "first", batter_name)
             elif second_runner and first_runner:
-                # First and second occupied
                 self.bases.move_runner("second", "third", second_runner)
                 self.bases.move_runner("first", "second", first_runner)
                 self.bases.move_runner("none", "first", batter_name)
             else:
-                # Only first occupied
                 self.bases.move_runner("first", "second", first_runner)
                 self.bases.move_runner("none", "first", batter_name)
 
         self.reset_count()
 
     def _handle_strikeout(self, batter_name: Optional[str]):
-        """Handle a strikeout: record out and reset count."""
         self.record_outs(1)
         self.reset_count()
 
     def record_outs(self, outs: int):
-        """Record outs and trigger side change if 3+ outs."""
         self.outs += outs
         if self.outs >= 3:
             self.change_sides()
 
     def change_sides(self):
-        """Change sides: reset outs, clear bases, reset count, advance inning."""
         self.outs = 0
         self.bases.clear()
         self.reset_count()
         self.inning.next_half()
 
     def validate_play(self, play: Play) -> Tuple[bool, str]:
-        """
-        Validate if this play makes sense given current game state.
-        Returns (is_valid, error_message)
-        """
         if not getattr(play, "play_type", None):
             return False, "Play type is required"
 
@@ -218,14 +181,12 @@ class GameState:
         if self.outs + play.outs_made > 3:
             return False, f"Too many outs: current={self.outs}, play adds={play.outs_made}"
 
-        # Validate double/triple play outs
         if play.play_type == "double_play" and play.outs_made != 2:
             return False, f"Double play must have outs_made=2, got {play.outs_made}"
         
         if play.play_type == "triple_play" and play.outs_made != 3:
             return False, f"Triple play must have outs_made=3, got {play.outs_made}"
 
-        # Validate runner movements - RELAXED validation for runners
         for move in play.runners:
             start = move.start_base or "none"
             end = move.end_base or "none"
@@ -235,13 +196,9 @@ class GameState:
             if end not in ["out", "none", "first", "second", "third", "home"]:
                 return False, f"Invalid end_base: {end}"
 
-            # RELAXED: Don't validate if runner exists on start base
-            # The LLM knows from context and we trust it
-
         return True, "Play is valid"
 
     def preview_play(self, play: Play) -> str:
-        """Show what would happen if this play were applied (does not mutate)."""
         valid, error = self.validate_play(play)
         if not valid:
             return f"INVALID PLAY: {error}"
@@ -262,30 +219,23 @@ class GameState:
         return "\n".join(preview)
 
     def _apply_home_run(self, play: Play):
-        """Handle home run scoring: score all base runners + batter, then clear bases."""
-        runs_to_score = 1  # Batter always scores
-        
-        # Score base runners
+        runs_to_score = 1
         for base in ["third", "second", "first"]:
             runner = self.bases.get_runner(base)
             if runner:
                 runs_to_score += 1
                 self.bases.clear_base(base)
-        
         self.add_runs(runs_to_score)
         self.reset_count()
 
     def _apply_runner_movements(self, play: Play):
-        """Apply runner movements recorded in play.runners."""
         runs_scored = 0
-        
         for move in play.runners:
             start = move.start_base or "none"
             end = move.end_base or "none"
             player = move.player
 
             if end == "home":
-                # runner scores
                 runs_scored += 1
                 if start in ["first", "second", "third"]:
                     self.bases.clear_base(start)
@@ -295,12 +245,10 @@ class GameState:
                 if start in ["first", "second", "third"]:
                     self.bases.clear_base(start)
         
-        # Add the runs that scored
         if runs_scored > 0:
             self.add_runs(runs_scored)
 
     def _apply_batter_on_base(self, play: Play):
-        """Place batter on correct base for single/double/triple if batter provided."""
         if not play.batter:
             return
         if play.play_type == "single":
@@ -309,10 +257,8 @@ class GameState:
             self.bases.move_runner("none", "second", play.batter)
         elif play.play_type == "triple":
             self.bases.move_runner("none", "third", play.batter)
-        # NOTE: walk is NOT handled here - LLM provides runner movements
 
     def update(self, play: Play, validate: bool = True):
-        """Update state from a Play object."""
         if validate:
             valid, error = self.validate_play(play)
             if not valid:
@@ -320,43 +266,25 @@ class GameState:
 
         self.history.append(play)
 
-        # Handle individual pitches (ball, called_strike, swinging_strike, foul)
         if play.play_type in ["ball", "called_strike", "swinging_strike", "foul"]:
             pitch_type = play.play_type
             event, should_continue = self.record_pitch(pitch_type, play.batter)
-            if play.balls is not None and play.balls != self.balls:
-                print(f"[DEBUG] ⚾ LLM balls={play.balls} ≠ internal={self.balls} ({pitch_type})")
-
-            if play.strikes is not None and play.strikes != self.strikes:
-                print(f"[DEBUG] ⚾ LLM strikes={play.strikes} ≠ internal={self.strikes} ({pitch_type})") 
-            # Sync the count from Play if provided (override with LLM's count)
             if play.balls is not None:
-            # don't accept impossible ball counts; keep the larger sensible value
                 self.balls = max(self.balls, min(play.balls, 3))
-                if play.strikes is not None:
-                    # cap strikes at 2 (foul should not make 3), prefer higher but never >2
-                    self.strikes = max(self.strikes, min(play.strikes, 2)) 
-            
-            return  # Don't process further for individual pitches
+            if play.strikes is not None:
+                self.strikes = max(self.strikes, min(play.strikes, 2))
+            return
 
-        # Special-case: home run (score everything + batter, clear bases)
-        # Handle this FIRST to avoid double-counting runs
         if play.play_type == "home_run":
             self._apply_home_run(play)
             return
 
-        # CRITICAL: Apply runner movements BEFORE recording outs
-        # This ensures runs score before the inning potentially ends
         if play.runners:
             self._apply_runner_movements(play)
 
-        # Apply outs (this may trigger side change)
-        # NOTE: This happens AFTER runner movements so sac flies work correctly
         if play.outs_made > 0:
             self.record_outs(play.outs_made)
 
-        # Place batter on base for normal hits
-        # NOTE: Walks are handled by runner movements from LLM, not _apply_batter_on_base
         if play.play_type in ["single", "double", "triple"]:
             self._apply_batter_on_base(play)
             self.reset_count()
@@ -364,45 +292,37 @@ class GameState:
             self.reset_count()
 
     def undo_last_play(self) -> bool:
-        """Undo the last play by replaying history without the last item."""
         if not self.history:
             return False
 
         removed = self.history.pop()
         home_name = self.home.name
         away_name = self.away.name
-        history_to_replay = list(self.history)  # Save history BEFORE reset
+        history_to_replay = list(self.history)
         
         self.__init__(home_team=home_name, away_team=away_name)
-        
-        for p in history_to_replay:  # Replay from saved list
+        for p in history_to_replay:
             self.update(p, validate=False)
 
         print(f"UNDO: removed play {removed.play_type}")
         return True
     
     def get_last_n_plays(self, n: int = 3) -> List[str]:
-        """Get a formatted list of the last N plays for display."""
         if not self.history:
             return ["No plays yet"]
         
         last_plays = self.history[-n:]
         formatted = []
         for i, play in enumerate(reversed(last_plays), 1):
-            play_desc = self._format_play_description(play)
-            formatted.append(f"{i}. {play_desc}")
+            formatted.append(f"{i}. {self._format_play_description(play)}")
         
         return formatted
     
     def _format_play_description(self, play: Play) -> str:
-        """Format a play into a human-readable description."""
         desc_parts = []
-        
-        # Batter name
         if play.batter:
             desc_parts.append(play.batter)
         
-        # Play type with friendly names
         play_type_map = {
             "ball": "Ball",
             "called_strike": "Called Strike",
@@ -422,31 +342,24 @@ class GameState:
             "triple_play": "Triple Play",
         }
         play_desc = play_type_map.get(play.play_type, play.play_type.replace("_", " ").title())
-        
-        # Add hit type if available
-        if hasattr(play, 'hit_type') and play.hit_type:
-            hit_type_map = {
-                "ground_ball": "GB",
-                "fly_ball": "FB", 
-                "line_drive": "LD",
-                "popup": "PU",
-                "bunt": "BNT"
-            }
-            hit_abbrev = hit_type_map.get(play.hit_type, play.hit_type)
-            play_desc = f"{play_desc} ({hit_abbrev})"
-        
+
+        if getattr(play, "hit_type", None):
+            hit_type_map = {"ground_ball": "GB", "fly_ball": "FB", "line_drive": "LD", "popup": "PU", "bunt": "BNT"}
+            play_desc = f"{play_desc} ({hit_type_map.get(play.hit_type, play.hit_type)})"
+
+        if getattr(play, "hit_direction", None):
+            play_desc = f"{play_desc} to {play.hit_direction}"
+
         desc_parts.append(play_desc)
-        
-        # Add runs/outs info if relevant
+
         if play.runs_scored > 0:
             desc_parts.append(f"({play.runs_scored} run{'s' if play.runs_scored > 1 else ''})")
         if play.outs_made > 0:
             desc_parts.append(f"({play.outs_made} out{'s' if play.outs_made > 1 else ''})")
-        
+
         return " - ".join(desc_parts)
 
     def to_json(self, path: str = "gamestate.json"):
-        """Persist current game state and history to disk."""
         obj = {
             "home": self.home.to_dict(),
             "away": self.away.to_dict(),
@@ -490,9 +403,12 @@ class GameState:
             if runner:
                 bases_str.append(f"{base}: {runner}")
         bases_display = ", ".join(bases_str) if bases_str else "Bases empty"
-        
+
+        last_play_desc = self._format_play_description(self.history[-1]) if self.history else "No plays yet"
+
         return (
             f"{self.away} | {self.home} | "
             f"Inning: {self.inning}, Count: {self.balls}-{self.strikes}, "
-            f"Outs: {self.outs} | {bases_display}"
+            f"Outs: {self.outs} | {bases_display}\n"
+            f"Last play: {last_play_desc}"
         )

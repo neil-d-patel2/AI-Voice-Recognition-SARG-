@@ -20,7 +20,8 @@ app = QApplication(sys.argv)
 game = GameState(home_team="HOME", away_team="AWAY")
 gui = GameGUI(game)
 gui.show()
-play_files = ["double1.mp3", "double2.mp3"]
+#play_files = ["double1.mp3", "double2.mp3"]
+play_files = ["direction1.mp3", "direction2.mp3"]
 """
 play_files = ["output.mp3",
               "output2.mp3",
