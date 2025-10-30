@@ -45,8 +45,9 @@ CRITICAL PARSING RULES:
    - Example: "count, zero one" = balls: 0, strikes: 1
 
 4. RUNNERS - THIS IS CRITICAL:
-   - ALWAYS check "Current game state" for who's on base BEFORE the play
    - For batters: ALWAYS use start_base = "none" (NEVER use "batter" or "plate")
+   - If "Current game state" is mentioned, use it to understand who's on base BEFORE the play
+   - If no "Current game state" is mentioned, infer runners from the transcript context
    - For HITS: Batter goes from "none" to base (first/second/third)
    - For HITS with runners: Advance runners based on hit type:
      * Single: runners advance 1 base (first→second, second→third, third→home)
@@ -59,18 +60,23 @@ CRITICAL PARSING RULES:
      * This is called a "sacrifice fly"
    - For WALKS: Batter to first (none→first)
    - For DOUBLE PLAYS:
-    * MUST have outs_made = 2
+    * ALWAYS set outs_made = 2 (no exceptions!)
     * Usually 2 runners with end_base = "out"
     * Batter: start_base = "none", end_base = "out"
-    * Base runner: start_base = their base, end_base = "out"
+    * Base runner: start_base = their base (first/second/third), end_base = "out"
     * Example: DP with runner on first: [{{"player": "Runner", "start_base": "first", "end_base": "out"}}, {{"player": "Batter", "start_base": "none", "end_base": "out"}}]
+    * Even if transcript doesn't mention a runner, infer there must have been one on base for a double play
 
 
-5. OUTS_MADE - SIMPLE RULE:
+5. OUTS_MADE - CRITICAL RULE (based on PLAY TYPE, not game state):
    - Pitches (ball, called_strike, swinging_strike, foul) → outs_made = 0
    - Hits/Walks → outs_made = 0
-   - ANY out (fly_out, ground_out, line_out, pop_out, strikeout) → outs_made = 1
+   - Single outs (fly_out, ground_out, line_out, pop_out, strikeout) → outs_made = 1
+   - Double plays → outs_made = 2 (ALWAYS, regardless of what transcript says)
+   - Triple plays → outs_made = 3 (ALWAYS, regardless of what transcript says)
    - CRITICAL: Foul balls ALWAYS outs_made = 0 (even if transcript says "2 out")
+   - CRITICAL: Ignore the "X out" or "X outs" mentioned in transcript - that's the RESULT, not the play's outs_made
+   - Base outs_made on the PLAY TYPE (double_play=2, ground_out=1, etc.), NOT on the resulting game state
 
 6. RUNS_SCORED:
    - Count runners with end_base="home"
@@ -125,11 +131,13 @@ NOW PARSE THIS TRANSCRIPT:
 "{transcript}"
 
 KEY REMINDERS:
+- "Current game state" is OPTIONAL - only helpful for context, not required
 - Extract count from "Count: X-Y" format
-- All outs get outs_made = 1 and usually empty runners array
-- EXCEPTION: Fly out with runner on third → runner scores (sac fly)
+- outs_made is based on PLAY TYPE: ground_out=1, double_play=2, triple_play=3, etc.
+- IGNORE the "X out" mentioned in transcript result - that's the game state AFTER the play
+- Double plays ALWAYS have outs_made = 2 (even if transcript doesn't explicitly say it)
 - Fouls ALWAYS get outs_made = 0
-- The outs mentioned in transcript = current game state, NOT this play's outs_made
+- EXCEPTION: Fly out with runner on third → runner scores (sac fly)
 """,
     input_variables=["transcript"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
