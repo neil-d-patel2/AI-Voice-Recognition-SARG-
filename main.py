@@ -31,7 +31,8 @@ play_files = ["output.mp3",
               "out3.mp3",
               "yankees_play1.mp3"]
 """
-play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3", "play7.mp3", "play8.mp3", "play9.mp3", "play10.mp3"]
+play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3", "play7.mp3", "play8.mp3", "play9.mp3", 
+              "play10.mp3", "play11.mp3", "play12.mp3"]
 #play_files = ['play1_test.mp3', 'play2_test.mp3']
 
 #play_files = ["demo1.mp3", "demo2.mp3","demo3.mp3", "demo4.mp3"]

@@ -8,8 +8,6 @@ from pydantic import BaseModel
 
 # Build parser bound to the Pydantic model
 parser = PydanticOutputParser(pydantic_object=Play)
-
-# Strict prompt - ONLY accepts the standardized format
 prompt = PromptTemplate(
     template="""You are a baseball scorekeeping assistant. Parse the transcript into JSON.
 
@@ -55,17 +53,18 @@ CRITICAL PARSING RULES:
      * Double: runners advance 2+ bases (first→third or home, second→home, third→home)
      * Triple: ALL runners score (→home)
      * Home run: ALL runners score including batter (→home)
-   - For DOUBLE PLAYS:
-     * MUST have outs_made = 2
-     * Usually 2 runners with end_base = "out"
-     * Batter: start_base = "none", end_base = "out"
-     * Base runner: start_base = their base, end_base = "out"
-     * Example: DP with runner on first: [{"player": "Runner", "start_base": "first", "end_base": "out"}, {"player": "Batter", "start_base": "none", "end_base": "out"}]
-   - For OUTS (fly_out, ground_out, line_out):
+   - For OUTS (fly_out, ground_out, line_out, pop_out, strikeout):
      * Usually NO runner movements (runners array empty)
      * EXCEPTION: If runner on third AND fly_out → runner scores (third→home), runs_scored=1
      * This is called a "sacrifice fly"
    - For WALKS: Batter to first (none→first)
+   - For DOUBLE PLAYS:
+    * MUST have outs_made = 2
+    * Usually 2 runners with end_base = "out"
+    * Batter: start_base = "none", end_base = "out"
+    * Base runner: start_base = their base, end_base = "out"
+    * Example: DP with runner on first: [{{"player": "Runner", "start_base": "first", "end_base": "out"}}, {{"player": "Batter", "start_base": "none", "end_base": "out"}}]
+
 
 5. OUTS_MADE - SIMPLE RULE:
    - Pitches (ball, called_strike, swinging_strike, foul) → outs_made = 0
@@ -118,9 +117,9 @@ Output: {{"play_type": "fly_out", "batter": "DeAndre", "balls": 0, "strikes": 0,
 NOTE: On a fly out, ONLY the runner on third (Rodriguez) tags and scores. Sarah on second stays put (no movement for her).
 
 Example 9:
-Input: "Marcus grounds into double play. Marcus out at first. Jessica out at second. Count 0-0. Bases empty. 2 outs. Score away 0 home 0. Current game state - Count: 0-0, Outs: 0, Runners: first: Jessica"
-Output: {{"play_type": "double_play", "batter": "Marcus", "balls": 0, "strikes": 0, "runners": [{{"player": "Jessica", "start_base": "first", "end_base": "out"}}, {{"player": "Marcus", "start_base": "none", "end_base": "out"}}], "outs_made": 2, "runs_scored": 0, "at_bat_complete": true}}
-NOTE: Double plays MUST have outs_made=2. Batter uses start_base="none" (NOT "batter").
+Input: "Tommy Thalsedoff, Count, Zero, Two, Runner on Second: Sarah, 2 out, Score, Three-zero. Current game state - Count: 0-1, Outs: 2, Bases empty"
+Output: {{"play_type": "foul", "batter": "Tommy Thalsedoff", "balls": 0, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
+NOTE: This is a FOUL ball, NOT an out. The "2 out" in transcript is game state. Fouls ALWAYS have outs_made=0.
 
 NOW PARSE THIS TRANSCRIPT:
 "{transcript}"
