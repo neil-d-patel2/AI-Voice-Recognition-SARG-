@@ -21,7 +21,7 @@ game = GameState(home_team="HOME", away_team="AWAY")
 gui = GameGUI(game)
 gui.show()
 #play_files = ["double1.mp3", "double2.mp3"]
-play_files = ["direction1.mp3", "direction2.mp3"]
+play_files = ["direction1.mp3","direction2.mp3"]
 """
 play_files = ["output.mp3",
               "output2.mp3",
@@ -75,7 +75,7 @@ for plays in play_files:
      transcript_with_context = transcript + context_info
      
      # Parse the play with context
-     play = parse_transcript(transcript_with_context)
+     play = parse_transcript(transcript)
      print(play)
      
      '''print(f"DEBUG Play object: {play}")
@@ -95,7 +95,7 @@ for plays in play_files:
      print("State of the Game: ")
      print(game)
      print("\n Transcript:")
-     print(transcript_with_context)
+     print(transcript)
      print("\n")
 
 

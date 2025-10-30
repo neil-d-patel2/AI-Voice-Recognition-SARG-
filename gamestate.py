@@ -319,45 +319,38 @@ class GameState:
         return formatted
     
     def _format_play_description(self, play: Play) -> str:
-        desc_parts = []
-        if play.batter:
-            desc_parts.append(play.batter)
-        
-        play_type_map = {
-            "ball": "Ball",
-            "called_strike": "Called Strike",
-            "swinging_strike": "Swinging Strike",
-            "foul": "Foul",
-            "single": "Single",
-            "double": "Double",
-            "triple": "Triple",
-            "home_run": "Home Run",
-            "ground_out": "Ground Out",
-            "fly_out": "Fly Out",
-            "line_out": "Line Out",
-            "pop_out": "Pop Out",
-            "strikeout": "Strikeout",
-            "walk": "Walk",
-            "double_play": "Double Play",
-            "triple_play": "Triple Play",
-        }
-        play_desc = play_type_map.get(play.play_type, play.play_type.replace("_", " ").title())
+        """
+        Return only the hit type and hit direction as a string.
+        Example: "Ground ball to shortstop", "Line drive to center field"
+        """
+        if not getattr(play, "hit_type", None):
+            return ""  # no hit info available
 
-        if getattr(play, "hit_type", None):
-            hit_type_map = {"ground_ball": "GB", "fly_ball": "FB", "line_drive": "LD", "popup": "PU", "bunt": "BNT"}
-            play_desc = f"{play_desc} ({hit_type_map.get(play.hit_type, play.hit_type)})"
+        # Map hit types to readable format
+        hit_type_map = {
+        "ground_ball": "Ground ball",
+        "fly_ball": "Fly ball",
+        "line_drive": "Line drive",
+        "popup": "Popup",
+        "bunt": "Bunt"
+            }
 
+        hit_type_str = hit_type_map.get(play.hit_type, play.hit_type.replace("_", " ").title())
+
+    # Format hit direction
+        direction_str = ""
         if getattr(play, "hit_direction", None):
-            play_desc = f"{play_desc} to {play.hit_direction}"
+        # Only prepend "to" if not already present
+            if play.hit_direction.lower().startswith("to "):
+                direction_str = play.hit_direction
+            else:
+                direction_str = f"to {play.hit_direction}"
 
-        desc_parts.append(play_desc)
-
-        if play.runs_scored > 0:
-            desc_parts.append(f"({play.runs_scored} run{'s' if play.runs_scored > 1 else ''})")
-        if play.outs_made > 0:
-            desc_parts.append(f"({play.outs_made} out{'s' if play.outs_made > 1 else ''})")
-
-        return " - ".join(desc_parts)
+    # Combine hit type + direction
+        if direction_str:
+            return f"{hit_type_str} {direction_str}"
+        return hit_type_str
+ 
 
     def to_json(self, path: str = "gamestate.json"):
         obj = {
@@ -410,5 +403,5 @@ class GameState:
             f"{self.away} | {self.home} | "
             f"Inning: {self.inning}, Count: {self.balls}-{self.strikes}, "
             f"Outs: {self.outs} | {bases_display}\n"
-            f"Last play: {last_play_desc}"
+            f"Hit type and direction: {last_play_desc}"
         )
