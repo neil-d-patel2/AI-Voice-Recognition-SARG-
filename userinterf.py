@@ -1,4 +1,4 @@
-# userinterf.py
+# user interface
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout, 
                             QPushButton, QHBoxLayout, QLineEdit, QMessageBox)
 

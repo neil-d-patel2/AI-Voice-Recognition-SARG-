@@ -13,6 +13,6 @@ def clean_llm_output(raw_text: str):
     match = re.search(r"\{.*\}", cleaned, re.DOTALL)
     return match.group(0) if match else cleaned
 
-raw_output = llm_output  # what your chain returns
+raw_output = llm_output
 json_text = clean_llm_output(raw_output)
 play = parse_transcript(json_text)
