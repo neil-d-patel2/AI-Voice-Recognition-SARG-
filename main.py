@@ -75,6 +75,7 @@ for plays in play_files:
      
      # Parse the play with context
      play = parse_transcript(transcript_with_context)
+     print(play)
      
      '''print(f"DEBUG Play object: {play}")
      print(f"DEBUG Play.batter: {play.batter}")
