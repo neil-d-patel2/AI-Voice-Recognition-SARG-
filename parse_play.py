@@ -8,8 +8,7 @@ from pydantic import BaseModel
 
 # Build parser bound to the Pydantic model
 parser = PydanticOutputParser(pydantic_object=Play)
-#The comment we use here may change after updating the quality of the llm
-#We want to pivot to gpt-4 mini in the future
+
 # Strict prompt - ONLY accepts the standardized format
 prompt = PromptTemplate(
     template="""You are a baseball scorekeeping assistant. Parse the transcript into JSON.
@@ -35,8 +34,12 @@ CRITICAL PARSING RULES:
    - "hits a home run" → home_run
    - "flies out" → fly_out
    - "grounds out" → ground_out
+   - "lines out" → line_out
+   - "pops out" → pop_out
    - "strikes out" → strikeout
    - "draws a walk" or "walks" → walk
+   - "grounds into a double play" or "double play" → double_play
+   - "hit by pitch" → hit_by_pitch
 
 3. COUNT: Extract numbers from "Count: X-Y" or "count, X-Y" or "count, X Y"
    - Convert word numbers: zero→0, one→1, two→2, three→3
@@ -45,13 +48,20 @@ CRITICAL PARSING RULES:
 
 4. RUNNERS - THIS IS CRITICAL:
    - ALWAYS check "Current game state" for who's on base BEFORE the play
+   - For batters: ALWAYS use start_base = "none" (NEVER use "batter" or "plate")
    - For HITS: Batter goes from "none" to base (first/second/third)
    - For HITS with runners: Advance runners based on hit type:
      * Single: runners advance 1 base (first→second, second→third, third→home)
      * Double: runners advance 2+ bases (first→third or home, second→home, third→home)
      * Triple: ALL runners score (→home)
      * Home run: ALL runners score including batter (→home)
-   - For OUTS (fly_out, ground_out, line_out, pop_out, strikeout):
+   - For DOUBLE PLAYS:
+     * MUST have outs_made = 2
+     * Usually 2 runners with end_base = "out"
+     * Batter: start_base = "none", end_base = "out"
+     * Base runner: start_base = their base, end_base = "out"
+     * Example: DP with runner on first: [{"player": "Runner", "start_base": "first", "end_base": "out"}, {"player": "Batter", "start_base": "none", "end_base": "out"}]
+   - For OUTS (fly_out, ground_out, line_out):
      * Usually NO runner movements (runners array empty)
      * EXCEPTION: If runner on third AND fly_out → runner scores (third→home), runs_scored=1
      * This is called a "sacrifice fly"
@@ -108,9 +118,9 @@ Output: {{"play_type": "fly_out", "batter": "DeAndre", "balls": 0, "strikes": 0,
 NOTE: On a fly out, ONLY the runner on third (Rodriguez) tags and scores. Sarah on second stays put (no movement for her).
 
 Example 9:
-Input: "Tommy Thalsedoff, Count, Zero, Two, Runner on Second: Sarah, 2 out, Score, Three-zero. Current game state - Count: 0-1, Outs: 2, Bases empty"
-Output: {{"play_type": "foul", "batter": "Tommy Thalsedoff", "balls": 0, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
-NOTE: This is a FOUL ball, NOT an out. The "2 out" in transcript is game state. Fouls ALWAYS have outs_made=0.
+Input: "Marcus grounds into double play. Marcus out at first. Jessica out at second. Count 0-0. Bases empty. 2 outs. Score away 0 home 0. Current game state - Count: 0-0, Outs: 0, Runners: first: Jessica"
+Output: {{"play_type": "double_play", "batter": "Marcus", "balls": 0, "strikes": 0, "runners": [{{"player": "Jessica", "start_base": "first", "end_base": "out"}}, {{"player": "Marcus", "start_base": "none", "end_base": "out"}}], "outs_made": 2, "runs_scored": 0, "at_bat_complete": true}}
+NOTE: Double plays MUST have outs_made=2. Batter uses start_base="none" (NOT "batter").
 
 NOW PARSE THIS TRANSCRIPT:
 "{transcript}"
