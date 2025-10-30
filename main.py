@@ -95,7 +95,7 @@ for plays in play_files:
      print("State of the Game: ")
      print(game)
      print("\n Transcript:")
-     print(transcript)
+     print(transcript_with_context)
      print("\n")
 
 

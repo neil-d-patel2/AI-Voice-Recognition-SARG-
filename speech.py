@@ -46,7 +46,10 @@ COMMON_MISTAKES = {
     "Nil-Nil": "zero-zero",
     "0-0": "zero-zero",
     "no-no": "zero-zero",
-    "zerol": "zero"    # Add more common mistakes as needed
+    "zerol": "zero",
+    "intwo": "into",
+    "two shortstwop": "to shortstop",
+    "zero-zero": "0-0",# Add more common mistakes as needed
 }
 
 
