@@ -59,6 +59,12 @@ class Play(BaseModel):
     batter: Optional[str] = Field(None, description="Batter name or number")
     pitcher: Optional[str] = Field(None, description="Pitcher name or number")
     
+    # Hit type information (describes the contact made)
+    hit_type: Optional[Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt"]] = Field(
+        None, 
+        description="Type of contact made (e.g., ground ball, fly ball, line drive, popup, bunt)"
+    )
+    
     # Count information (present after pitch-type plays)
     balls: Optional[int] = Field(None, description="Balls in count after this play (0-4)")
     strikes: Optional[int] = Field(None, description="Strikes in count after this play (0-3)")

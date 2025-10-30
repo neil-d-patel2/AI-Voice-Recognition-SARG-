@@ -218,6 +218,13 @@ class GameState:
         if self.outs + play.outs_made > 3:
             return False, f"Too many outs: current={self.outs}, play adds={play.outs_made}"
 
+        # Validate double/triple play outs
+        if play.play_type == "double_play" and play.outs_made != 2:
+            return False, f"Double play must have outs_made=2, got {play.outs_made}"
+        
+        if play.play_type == "triple_play" and play.outs_made != 3:
+            return False, f"Triple play must have outs_made=3, got {play.outs_made}"
+
         # Validate runner movements - RELAXED validation for runners
         for move in play.runners:
             start = move.start_base or "none"
@@ -353,7 +360,7 @@ class GameState:
         if play.play_type in ["single", "double", "triple"]:
             self._apply_batter_on_base(play)
             self.reset_count()
-        elif play.play_type in ["walk", "strikeout", "ground_out", "fly_out", "line_out", "pop_out"]:
+        elif play.play_type in ["walk", "strikeout", "ground_out", "fly_out", "line_out", "pop_out", "double_play", "triple_play"]:
             self.reset_count()
 
     def undo_last_play(self) -> bool:
@@ -411,8 +418,23 @@ class GameState:
             "pop_out": "Pop Out",
             "strikeout": "Strikeout",
             "walk": "Walk",
+            "double_play": "Double Play",
+            "triple_play": "Triple Play",
         }
         play_desc = play_type_map.get(play.play_type, play.play_type.replace("_", " ").title())
+        
+        # Add hit type if available
+        if hasattr(play, 'hit_type') and play.hit_type:
+            hit_type_map = {
+                "ground_ball": "GB",
+                "fly_ball": "FB", 
+                "line_drive": "LD",
+                "popup": "PU",
+                "bunt": "BNT"
+            }
+            hit_abbrev = hit_type_map.get(play.hit_type, play.hit_type)
+            play_desc = f"{play_desc} ({hit_abbrev})"
+        
         desc_parts.append(play_desc)
         
         # Add runs/outs info if relevant

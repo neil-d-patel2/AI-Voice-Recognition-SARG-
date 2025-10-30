@@ -39,6 +39,18 @@ CRITICAL PARSING RULES:
    - "grounds into a double play" or "double play" → double_play
    - "hit by pitch" → hit_by_pitch
 
+2a. HIT_TYPE - Extract the type of contact (set hit_type field):
+   - Look for keywords: "ground ball", "groundball", "grounder" → ground_ball
+   - "fly ball", "flyball", "flies" → fly_ball  
+   - "line drive", "liner", "lines" → line_drive
+   - "pop up", "popup", "pops" → popup
+   - "bunt" → bunt
+   - If play_type is ground_out → hit_type should be ground_ball
+   - If play_type is fly_out → hit_type should be fly_ball
+   - If play_type is line_out → hit_type should be line_drive
+   - If play_type is pop_out → hit_type should be popup
+   - For other plays, only set hit_type if explicitly mentioned in transcript
+
 3. COUNT: Extract numbers from "Count: X-Y" or "count, X-Y" or "count, X Y"
    - Convert word numbers: zero→0, one→1, two→2, three→3
    - Format is ALWAYS balls-strikes (first number = balls, second number = strikes)
@@ -59,11 +71,12 @@ CRITICAL PARSING RULES:
      * This is called a "sacrifice fly"
    - For WALKS: Batter to first (none→first)
    - For DOUBLE PLAYS:
-    * MUST have outs_made = 2
+    * CRITICAL: outs_made MUST equal 2 (not 1, not 0)
     * Usually 2 runners with end_base = "out"
     * Batter: start_base = "none", end_base = "out"
-    * Base runner: start_base = their base, end_base = "out"
+    * Base runner: start_base = their base (first, second, or third), end_base = "out"
     * Example: DP with runner on first: [{{"player": "Runner", "start_base": "first", "end_base": "out"}}, {{"player": "Batter", "start_base": "none", "end_base": "out"}}]
+    * hit_type should be ground_ball for ground ball double plays
 
 
 5. OUTS_MADE - SIMPLE RULE:
@@ -113,13 +126,18 @@ Output: {{"play_type": "double", "batter": "Sarah", "balls": 0, "strikes": 0, "r
 
 Example 8:
 Input: "DeAndre flies out two center field, Count, zero, zero, Runner on second: Sarah 2 out, Score: 3-0. Current game state - Count: 0-0, Outs: 2, Runners: second: Sarah, third: Rodriguez"
-Output: {{"play_type": "fly_out", "batter": "DeAndre", "balls": 0, "strikes": 0, "runners": [{{"player": "Rodriguez", "start_base": "third", "end_base": "home"}}], "outs_made": 1, "runs_scored": 1, "at_bat_complete": true}}
+Output: {{"play_type": "fly_out", "batter": "DeAndre", "balls": 0, "strikes": 0, "hit_type": "fly_ball", "runners": [{{"player": "Rodriguez", "start_base": "third", "end_base": "home"}}], "outs_made": 1, "runs_scored": 1, "at_bat_complete": true}}
 NOTE: On a fly out, ONLY the runner on third (Rodriguez) tags and scores. Sarah on second stays put (no movement for her).
 
 Example 9:
 Input: "Tommy Thalsedoff, Count, Zero, Two, Runner on Second: Sarah, 2 out, Score, Three-zero. Current game state - Count: 0-1, Outs: 2, Bases empty"
 Output: {{"play_type": "foul", "batter": "Tommy Thalsedoff", "balls": 0, "strikes": 2, "runners": [], "outs_made": 0, "runs_scored": 0, "at_bat_complete": false}}
 NOTE: This is a FOUL ball, NOT an out. The "2 out" in transcript is game state. Fouls ALWAYS have outs_made=0.
+
+Example 10:
+Input: "James grounds into a double play, Count, zero, zero, Bases empty, 2 out, Score, 3-1. Current game state - Count: 0-0, Outs: 0, Runners: first: Mike"
+Output: {{"play_type": "double_play", "batter": "James", "balls": 0, "strikes": 0, "hit_type": "ground_ball", "runners": [{{"player": "Mike", "start_base": "first", "end_base": "out"}}, {{"player": "James", "start_base": "none", "end_base": "out"}}], "outs_made": 2, "runs_scored": 0, "at_bat_complete": true}}
+NOTE: Double plays MUST have outs_made = 2. Both the base runner and the batter are out.
 
 NOW PARSE THIS TRANSCRIPT:
 "{transcript}"
