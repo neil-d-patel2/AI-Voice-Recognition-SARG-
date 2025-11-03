@@ -1,6 +1,7 @@
 # gamestate.py
 from typing import Optional, List, Dict, Tuple
 import json
+import copy
 from schema import Play, RunnerMovement
 
 
@@ -422,3 +423,24 @@ class GameState:
             f"Outs: {self.outs} | {bases_display}\n"
             f"Hit type and direction: {last_play_desc}"
         )
+        
+    def snapshot(self) -> str:
+        """
+        Return a string snapshot of the current game state.
+        Includes teams, runs, inning, count, outs, bases, and last play info.
+        """
+        bases_str = []
+        for base in ["first", "second", "third"]:
+            runner = self.bases.get_runner(base)
+            if runner:
+                bases_str.append(f"{base}: {runner}")
+        bases_display = ", ".join(bases_str) if bases_str else "Bases empty"
+
+        last_play_desc = self._format_play_description(self.history[-1]) if self.history else "No plays yet"
+
+        return (
+        f"{self.away} | {self.home} | "
+        f"Inning: {self.inning}, Count: {self.balls}-{self.strikes}, "
+        f"Outs: {self.outs} | {bases_display}\n"
+        f"Hit type and direction: {last_play_desc}"
+    )

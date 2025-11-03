@@ -12,6 +12,9 @@ import warnings
 from urllib3.exceptions import NotOpenSSLWarning
 from fix_hit_info import fix_hit_info
 
+#Prompt for a play every single time, then go through the logic
+#Dont automatically prompt for the play, but have a feature that allows for the current state of the game to be printed
+#also allow for the entire history to be printed as well
 warnings.filterwarnings(
     "ignore",
     category=NotOpenSSLWarning
@@ -21,24 +24,10 @@ app = QApplication(sys.argv)
 game = GameState(home_team="HOME", away_team="AWAY")
 gui = GameGUI(game)
 gui.show()
-#play_files = ["double1.mp3", "double2.mp3"]
+
+
 play_files = ["direction1.mp3","direction2.mp3"]
-"""
-play_files = ["output.mp3",
-              "output2.mp3",
-              "neil.mp3",
-              "home_run.mp3",
-              "out.mp3",
-              "out2.mp3",
-              "out3.mp3",
-              "yankees_play1.mp3"]
-"""
-#play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3", "play7.mp3", "play8.mp3", "play9.mp3", 
-#"play10.mp3", "play11.mp3", "play12.mp3"]
-#play_files = ['play1_test.mp3', 'play2_test.mp3']
-
-#play_files = ["demo1.mp3", "demo2.mp3","demo3.mp3", "demo4.mp3"]
-
+all_game_states = []
 ''' Have a while loop that prompts for plays, 
     append it to play files that can be printed,
     print gui, then prompt for another play
@@ -94,6 +83,7 @@ for plays in play_files:
          game.update(play)
          print("Play applied successfully!")
          gui.refresh_after_play(play)
+         all_game_states.append(game.snapshot())
      except ValueError as e:
         print(f"Play validation failed: {e}")
         print("Check play")
@@ -123,5 +113,11 @@ print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by
 '''
 
 print("="*60 + "\n")
+
+
+
+for states in all_game_states:
+    print(states)
+    
 
 sys.exit(app.exec())
