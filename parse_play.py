@@ -86,25 +86,16 @@ CRITICAL PARSING RULES:
    - Include these fields in JSON output if the transcript mentions them
    - Otherwise, leave them null
    
-8. HIT_TYPE & HIT_DIRECTION:
-   - HIT TYPE MAPPING (standardized abbreviations):
-     * ground_ball -> GB
-     * fly_ball -> FB
-     * line_drive -> LD
-     * popup -> PU
-     * bunt -> BNT
-   - HIT DIRECTION MAPPING (standard fielding locations):
-     * ss -> shortstop
-     * 2b -> second base
-     * 3b -> third base
-     * 1b -> first base
-     * lf -> left field
-     * cf -> center field
-     * rf -> right field
-     * p -> pitcher
-     * c -> catcher
-   - Include these fields in JSON output if the transcript mentions them
-   - Otherwise, leave them null
+8. HIT_TYPE & HIT_DIRECTION (ALWAYS RETURN THESE FIELDS):
+   - The transcript may describe the hit with phrases like "ground ball", "fly ball", "line drive", "popup", or "bunt".
+   - Extract the HIT TYPE even if the main play_type is something else (e.g., "grounds into a double play" still includes "ground ball").
+   - Extract the HIT DIRECTION whenever the transcript mentions a fielding location, such as "to shortstop", "to second base", "to left field", etc.
+   - If the transcript does NOT mention these details, explicitly set both to null (not omitted).
+   - Example outputs:
+       * hit_type: "ground_ball", hit_direction: "shortstop"
+       * hit_type: "line_drive", hit_direction: "center field"
+       * hit_type: null, hit_direction: null
+
 
 
 EXAMPLES (MATCH THESE PATTERNS EXACTLY):

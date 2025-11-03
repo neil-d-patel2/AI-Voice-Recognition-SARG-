@@ -44,9 +44,12 @@ scorekeeper at the end of the rag pipeline will be responsible for that.
 1. Having to use another human in this process, when the original goal was to automate it as much as possible. 
 
 
-
-
-
+'''     
+Have a while loop that prompts for plays, 
+append it to play files that can be printed,
+print gui, then prompt for another play
+until the game ends. 
+'''
 
 
 

@@ -5,6 +5,10 @@ from schema import Play, RunnerMovement
 
 
 class BatterState:
+    '''
+    Holds the state of the batter during an at-bat.
+    Eventually will be stored in a db similar to GameDay.
+    '''
     def __init__(self, player_name: str):
         self.player_name = player_name
         self.strikes = 0
@@ -31,6 +35,10 @@ class BatterState:
 
 
 class Bases:
+    '''
+    Bases state management for a baseball game.
+    Updated automatically after parsing.
+    '''    
     def __init__(self):
         self.state: Dict[str, Optional[str]] = {"first": None, "second": None, "third": None}
 
@@ -59,6 +67,9 @@ class Bases:
 
 
 class Inning:
+    '''
+    Manages the game state (top and bottom of innings).
+    '''
     def __init__(self):
         self.number: int = 1
         self.top: bool = True
@@ -75,6 +86,9 @@ class Inning:
 
 
 class Team:
+    '''
+    Represents a baseball team with name and runs scored.
+    '''
     def __init__(self, name: str):
         self.name: str = name
         self.runs: int = 0
@@ -90,6 +104,9 @@ class Team:
 
 
 class GameState:
+    '''
+    Manages the overall state of a baseball game with underlying logic. 
+    '''
     def __init__(self, home_team: str, away_team: str):
         self.home = Team(home_team)
         self.away = Team(away_team)

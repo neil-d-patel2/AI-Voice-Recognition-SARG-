@@ -10,6 +10,7 @@ from recorder import record_audio
 from userinterf import GameGUI, QApplication
 import warnings
 from urllib3.exceptions import NotOpenSSLWarning
+from fix_hit_info import fix_hit_info
 
 warnings.filterwarnings(
     "ignore",
@@ -40,8 +41,12 @@ play_files = ["output.mp3",
 
 ''' Have a while loop that prompts for plays, 
     append it to play files that can be printed,
-    print gui, then prompt for another play, then another play
-    until the game ends. '''
+    print gui, then prompt for another play
+    until the game ends. 
+'''
+mp3_folder = "s1"
+
+#for plays in play_files if in list 
 
 for plays in play_files:
      transcript = transcribe_audio(plays)
@@ -76,6 +81,7 @@ for plays in play_files:
      
      # Parse the play with context
      play = parse_transcript(transcript)
+     play = fix_hit_info(play, transcript)
      print(play)
      
      '''print(f"DEBUG Play object: {play}")
