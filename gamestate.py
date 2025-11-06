@@ -305,11 +305,13 @@ class GameState:
         if play.outs_made > 0:
             self.record_outs(play.outs_made)
 
+          # Batter movement only if there are runners
         if play.play_type in ["single", "double", "triple"]:
-            self._apply_batter_on_base(play)
+            if play.runners:
+                self._apply_batter_on_base(play)
             self.reset_count()
         elif play.play_type in ["walk", "strikeout", "ground_out", "fly_out", "line_out", "pop_out", "double_play", "triple_play"]:
-            self.reset_count()
+                 self.reset_count()
 
     def undo_last_play(self) -> bool:
         if not self.history:

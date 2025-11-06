@@ -86,5 +86,6 @@ def fix_play_info(play: Play, transcript: str) -> Play:
     # --------- 4. Clear runners if Bases empty ----------
     if "empty" in transcript_lower:
         play.runners = []
+        play.batter = None
 
     return play
