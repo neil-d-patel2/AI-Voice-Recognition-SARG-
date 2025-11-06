@@ -29,6 +29,7 @@ gui.show()
 
 
 play_files = ["direction1.mp3","direction2.mp3"]
+
 all_game_states = []
 ''' Have a while loop that prompts for plays, 
     append it to play files that can be printed,
@@ -36,12 +37,6 @@ all_game_states = []
     until the game ends. 
 '''
 mp3_folder = "s1"
-
-transcripts = [
-    "Justin hits a single. Ground ball to shortstop, count zero zero, Justin on first, No outs, score zero zero.",
-    "Alex grounds into a double play, ground ball to shortstop, count zero zero, Bases empty, No outs, score zero zero.",
-]
-
 
 #for plays in play_files if in list 
 

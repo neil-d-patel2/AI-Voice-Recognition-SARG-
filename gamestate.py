@@ -299,6 +299,8 @@ class GameState:
 
         if play.runners:
             self._apply_runner_movements(play)
+        else:
+            self.bases.clear()
 
         if play.outs_made > 0:
             self.record_outs(play.outs_made)
