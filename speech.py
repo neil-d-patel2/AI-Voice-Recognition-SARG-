@@ -52,7 +52,8 @@ COMMON_MISTAKES = {
     "zero-zero": "0-0",
     "two short stwop": "to shortstop",
     "no-0": "zero-zero",
-    "one first": "on first"
+    "one first": "on first",
+    "2 out": "2 outs"
 }
 
 

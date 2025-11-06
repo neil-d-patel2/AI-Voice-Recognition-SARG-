@@ -117,7 +117,7 @@ KEY REMINDERS:
 )
 
 # Increase temperature slightly for better parsing
-llm = OllamaLLM(model="llama3.1", temperature=0.1)
+llm = OllamaLLM(model="llama3.1", temperature=0)
 
 chain = prompt | llm | parser
 
