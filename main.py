@@ -28,7 +28,7 @@ gui = GameGUI(game)
 gui.show()
 
 
-play_files = ["direction1.mp3","direction2.mp3"]
+play_files = ["direction1.mp3","direction2.mp3", "direction3.mp3", "direction4.mp3", "direction5.mp3"]
 
 all_game_states = []
 ''' Have a while loop that prompts for plays, 

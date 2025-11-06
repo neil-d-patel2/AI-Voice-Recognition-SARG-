@@ -53,7 +53,8 @@ COMMON_MISTAKES = {
     "two short stwop": "to shortstop",
     "no-0": "zero-zero",
     "one first": "on first",
-    "2 out": "2 outs"
+    "2 out": "2 outs",
+    "line drive two center field": "line drive to center field",
 }
 
 
@@ -170,7 +171,6 @@ def standardize_transcript(text: str) -> str:
 
 
 if __name__ == "__main__":
-    # Test with some messy transcripts
     test_transcripts = [
         "Marcus takes a ball, count, 1-0, bases empty, no outs, score, 0-0,",
         "DeAndre flies out to center field, Count, nil, nil, Runner on second, Sarah 2 outs, Score, 3 nil,",
