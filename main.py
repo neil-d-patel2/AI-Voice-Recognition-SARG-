@@ -10,7 +10,9 @@ from recorder import record_audio
 from userinterf import GameGUI, QApplication
 import warnings
 from urllib3.exceptions import NotOpenSSLWarning
-from fix_hit_info import fix_hit_info
+from fix_hit_info import fix_play_info
+from extract_bases import extract_bases
+
 
 #Prompt for a play every single time, then go through the logic
 #Dont automatically prompt for the play, but have a feature that allows for the current state of the game to be printed
@@ -34,6 +36,12 @@ all_game_states = []
     until the game ends. 
 '''
 mp3_folder = "s1"
+
+transcripts = [
+    "Justin hits a single. Ground ball to shortstop, count zero zero, Justin on first, No outs, score zero zero.",
+    "Alex grounds into a double play, ground ball to shortstop, count zero zero, Bases empty, No outs, score zero zero.",
+]
+
 
 #for plays in play_files if in list 
 
@@ -70,7 +78,8 @@ for plays in play_files:
      
      # Parse the play with context
      play = parse_transcript(transcript)
-     play = fix_hit_info(play, transcript)
+     play = fix_play_info(play, transcript)
+     #play = extract_bases(play, transcript)
      print(play)
      
      '''print(f"DEBUG Play object: {play}")
