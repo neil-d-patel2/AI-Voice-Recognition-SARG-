@@ -115,7 +115,7 @@ KEY REMINDERS:
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
 
-# Increase temperature slightly for better parsing
+
 llm = OllamaLLM(
     model="llama3.1",
     temperature=0,
