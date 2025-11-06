@@ -106,7 +106,6 @@ NOW PARSE THIS TRANSCRIPT:
 
 KEY REMINDERS:
 - Extract count from "Count: X-Y" format
-- All outs get outs_made = 1 and usually empty runners array
 - EXCEPTION: Fly out with runner on third → runner scores (sac fly)
 - Fouls ALWAYS get outs_made = 0
 - The outs mentioned in transcript = current game state, NOT this play's outs_made
@@ -117,7 +116,13 @@ KEY REMINDERS:
 )
 
 # Increase temperature slightly for better parsing
-llm = OllamaLLM(model="llama3.1", temperature=0)
+llm = OllamaLLM(
+    model="llama3.1",
+    temperature=0,
+    top_p=1,
+    repeat_penalty=1,
+    mirostat=0
+   )
 
 chain = prompt | llm | parser
 
