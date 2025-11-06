@@ -269,12 +269,21 @@ class GameState:
     def _apply_batter_on_base(self, play: Play):
         if not play.batter:
             return
+
+        target_base = None
         if play.play_type == "single":
-            self.bases.move_runner("none", "first", play.batter)
+            target_base = "first"
         elif play.play_type == "double":
-            self.bases.move_runner("none", "second", play.batter)
+            target_base = "second"
         elif play.play_type == "triple":
-            self.bases.move_runner("none", "third", play.batter)
+            target_base = "third"
+
+        if target_base:
+        # Clear the base first
+            self.bases.clear_base(target_base)
+        # Move the batter
+            self.bases.move_runner("none", target_base, play.batter)
+
 
     def update(self, play: Play, validate: bool = True):
         if validate:
@@ -297,21 +306,35 @@ class GameState:
             self._apply_home_run(play)
             return
 
-        if play.runners:
+        if play.bases_after:
+        # Fill missing keys with None
+            for base in ["first", "second", "third"]:
+                if base not in play.bases_after:
+                    play.bases_after[base] = None
+            self.bases.state = play.bases_after.copy()
+
+
+
+        # Update outs to match transcript exactly
+        if play.outs_after_play is not None:      
+            self.outs += play.outs_made
+
+        ''' 
+         if play.runners:
             self._apply_runner_movements(play)
         else:
             self.bases.clear()
-
         if play.outs_made > 0:
             self.record_outs(play.outs_made)
-
-          # Batter movement only if there are runners
+            
         if play.play_type in ["single", "double", "triple"]:
             if play.runners:
                 self._apply_batter_on_base(play)
             self.reset_count()
         elif play.play_type in ["walk", "strikeout", "ground_out", "fly_out", "line_out", "pop_out", "double_play", "triple_play"]:
                  self.reset_count()
+        Commenting this block to see if LLM handles movements properly
+        '''
 
     def undo_last_play(self) -> bool:
         if not self.history:

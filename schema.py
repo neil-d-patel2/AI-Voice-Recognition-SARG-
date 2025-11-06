@@ -103,7 +103,8 @@ class Play(BaseModel):
     notes: Optional[str] = Field(None, description="Free text notes (for human logs)")
     raw_transcript: Optional[str] = Field(None, description="Raw Whisper transcript")
     confidence: Optional[float] = Field(None, description="LLM/parser confidence if available")
-
+    outs_after_play: Optional[int] = None
+    
     class Config:
         """Pydantic configuration with examples"""
         json_schema_extra = {

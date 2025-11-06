@@ -71,22 +71,28 @@ CRITICAL PARSING RULES:
    - Hits/Walks → outs_made = 0
    - ANY out (fly_out, ground_out, line_out, pop_out, strikeout) → outs_made = 1
    - CRITICAL: Foul balls ALWAYS outs_made = 0 (even if transcript says "2 out")
-
-6. RUNS_SCORED:
+   
+6. OUTS AFTER PLAY:
+   - **CRITICAL CHANGE**: Extract the **current number of outs mentioned in the transcript**.
+   - Store it in a new field called `outs_after_play` (integer).
+   - This represents the game’s outs **after this play**, and can differ from outs_made.
+   - Example: transcript says "2 out" → outs_after_play = 2
+   
+7. RUNS_SCORED:
    - Count runners with end_base="home"
    - Sacrifice fly: If runner on third, they score → runs_scored = 1
 
-7. AT_BAT_COMPLETE:
+8. AT_BAT_COMPLETE:
    - False: ball, called_strike, swinging_strike, foul
    - True: ALL others (hits, outs, walk, strikeout)
 
-8. HIT_TYPE & HIT_DIRECTION:
+9. HIT_TYPE & HIT_DIRECTION:
    - hit_type: "ground_ball", "fly_ball", "line_drive", "popup", "bunt" (if applicable)
    - hit_direction: "to shortstop", "to centerfield", "to right field", etc.
    - Include these fields in JSON output if the transcript mentions them
    - Otherwise, leave them null
    
-8. HIT_TYPE & HIT_DIRECTION (ALWAYS RETURN THESE FIELDS):
+10. HIT_TYPE & HIT_DIRECTION (ALWAYS RETURN THESE FIELDS):
    - The transcript may describe the hit with phrases like "ground ball", "fly ball", "line drive", "popup", or "bunt".
    - Extract the HIT TYPE even if the main play_type is something else (e.g., "grounds into a double play" still includes "ground ball").
    - Extract the HIT DIRECTION whenever the transcript mentions a fielding location, such as "to shortstop", "to second base", "to left field", etc.

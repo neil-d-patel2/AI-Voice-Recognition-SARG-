@@ -4,8 +4,6 @@ import re
 # Load model
 def transcribe_audio(file_path: str) -> str:
     model = whisper.load_model("base")
-    # goal is to distill this model or freeze layers 
-    # and in doing so, make the model understand "Baseball language better"
     # can start off by creating a kvp of incorrect terms that we commonly see
     # such as basis and bases being incorrect 
     '''
