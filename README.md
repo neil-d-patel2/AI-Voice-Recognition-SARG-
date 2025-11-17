@@ -318,17 +318,7 @@ This project is licensed for **educational purposes**.
 
 ---
 
-## 🙏 Acknowledgments
 
-Special thanks to:
-
-- 🤖 **OpenAI** for Whisper speech recognition
-- 🦙 **Ollama** team for local LLM deployment
-- 🦜 **LangChain** for LLM orchestration
-- 🖥️ **PyQt5** for the GUI framework
-- ⚾ **Baseball enthusiasts** everywhere
-
----
 
 <div align="center">
 
