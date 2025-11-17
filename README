@@ -1,307 +1,355 @@
-# SARG - Speech-Automated Real-time Game Tracker
+<div align="center">
 
-A voice-activated baseball scorekeeping system that uses speech recognition and natural language processing to track game state in real-time.
+# ⚾ SARG
 
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [How It Works](#how-it-works)
-- [Testing](#testing)
-- [Future Work](#future-work)
-- [Contributors](#contributors)
+### Speech-Automated Real-time Game Tracker
 
-## 🎯 Overview
+*A voice-activated baseball scorekeeping system powered by AI*
 
-SARG (Speech-Automated Real-time Game tracker) is an automated baseball scorekeeping system that processes voice announcements and maintains accurate game state. The system uses OpenAI's Whisper for speech-to-text transcription and a local LLM (llama3.1) for structured play parsing.
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: Educational](https://img.shields.io/badge/license-Educational-green.svg)](LICENSE)
+[![Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)](https://github.com)
 
-### Key Capabilities
-- **Voice-activated**: Processes audio announcements of baseball plays
-- **Real-time tracking**: Updates game state including score, outs, count, and base runners
-- **Intelligent parsing**: Uses LLM to extract structured play data from natural language
-- **Visual interface**: PyQt5 GUI displays live game state
-- **Undo functionality**: Can revert plays and replay game history
-- **Persistent storage**: Saves/loads game state to/from JSON
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture) • [Contributing](#-contributing)
 
-## ✨ Features
+---
 
-### Core Functionality
-- ✅ Tracks balls, strikes, outs, runs, and base runners
-- ✅ Handles all play types: hits, outs, walks, strikeouts, double plays
-- ✅ Manages inning progression (top/bottom transitions)
-- ✅ Processes sacrifice flies with proper run scoring
-- ✅ Supports complex scenarios (bases loaded, force plays, etc.)
+</div>
+
+## 🎯 What is SARG?
+
+SARG transforms the way baseball games are scored by combining **speech recognition** and **natural language processing** to automatically track every play, every out, every run—all from voice announcements.
+
+Simply speak the play, and SARG does the rest.
+
+### ✨ Why SARG?
+
+- 🎤 **Voice-First**: No more manual scorekeeping—just speak naturally
+- 🧠 **AI-Powered**: Uses OpenAI Whisper + Local LLM for intelligent parsing
+- ⚡ **Real-Time**: Instant updates to game state with every play
+- 🔄 **Undo Support**: Made a mistake? Just say "undo" or click a button
+- 💾 **Persistent**: Save and load games seamlessly
+
+---
+
+## 🌟 Features
+
+<table>
+<tr>
+<td width="50%">
+
+### Core Tracking
+- ✅ Balls, strikes, and outs
+- ✅ Base runners and scoring
+- ✅ Inning progression
+- ✅ Complete play history
+- ✅ All play types supported
+
+</td>
+<td width="50%">
 
 ### Advanced Features
-- ✅ Voice command recognition ("undo" to revert last play)
-- ✅ Transcript standardization for consistent parsing
-- ✅ Game state context passed to LLM for accurate parsing
-- ✅ Play-by-play history tracking
-- ✅ GUI with live updates and undo button
-- ✅ JSON persistence for game save/load
+- 🎙️ Voice command recognition
+- 🤖 LLM-based natural language parsing
+- 🖥️ Live GUI with PyQt5
+- 📝 JSON persistence
+- 🔙 Multi-level undo system
+
+</td>
+</tr>
+</table>
+
+---
 
 ## 🏗️ Architecture
 
+```mermaid
+graph TB
+    A[🎤 Audio Input] -->|MP3 Files| B[Speech Module]
+    B -->|Whisper AI| C[Transcription]
+    C -->|Clean & Standardize| D[Parser Module]
+    D -->|LLM Processing| E[Structured Play Data]
+    E --> F[GameState Manager]
+    F -->|Update Logic| G[🖥️ PyQt5 GUI]
+    F -.->|Save| H[💾 JSON Storage]
+    
+    style A fill:#e1f5ff
+    style D fill:#fff3e0
+    style F fill:#f3e5f5
+    style G fill:#e8f5e9
 ```
-┌─────────────┐
-│ Audio Input │ (play1.mp3, play2.mp3, ...)
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────┐
-│ Speech Module   │ (Whisper transcription)
-│ - transcribe    │
-│ - clean         │
-│ - standardize   │
-└──────┬──────────┘
-       │
-       ▼
-┌─────────────────┐
-│ Parser Module   │ (LLM-based structured extraction)
-│ - LangChain     │
-│ - Ollama/llama  │
-│ - Pydantic      │
-└──────┬──────────┘
-       │
-       ▼
-┌─────────────────┐
-│ GameState       │ (Core game logic)
-│ - Play objects  │
-│ - State machine │
-│ - History       │
-└──────┬──────────┘
-       │
-       ▼
-┌─────────────────┐
-│ GUI (PyQt5)     │ (Visual display)
-│ - Live updates  │
-│ - Undo button   │
-│ - History view  │
-└─────────────────┘
-```
+
+<details>
+<summary><b>🔍 Component Details</b></summary>
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Speech Recognition** | OpenAI Whisper | Converts audio to text |
+| **NLP Parser** | LangChain + Ollama | Extracts structured play data |
+| **Game Logic** | Python + Pydantic | Manages state and validation |
+| **Interface** | PyQt5 | Visual scoreboard display |
+| **Storage** | JSON | Persistent game data |
+
+</details>
+
+---
 
 ## 🚀 Installation
 
 ### Prerequisites
-- Python 3.9+
-- ffmpeg (for audio processing)
-- Ollama with llama3.1 model
 
-### Step 1: Install Dependencies
+Before you begin, ensure you have:
+
+- 🐍 **Python 3.9+**
+- 🎬 **ffmpeg** (for audio processing)
+- 🦙 **Ollama** with llama3.1 model
+
+### Quick Start
 
 ```bash
-# Clone the repository
+# 1️⃣ Clone the repository
 cd SARG-project
 
-# Install Python packages
+# 2️⃣ Install Python dependencies
 pip install -r requirements.txt
-```
 
-### Step 2: Install Ollama and Model
-
-```bash
-# Install Ollama (macOS)
+# 3️⃣ Install Ollama (macOS example)
 brew install ollama
-
-# Start Ollama service
 ollama serve
-
-# Pull llama3.1 model
 ollama pull llama3.1
+
+# 4️⃣ Install ffmpeg
+brew install ffmpeg  # macOS
+# sudo apt-get install ffmpeg  # Linux
 ```
 
-### Step 3: Install ffmpeg
+> 💡 **Windows Users**: Download ffmpeg from [ffmpeg.org](https://ffmpeg.org/download.html)
 
-```bash
-# macOS
-brew install ffmpeg
-
-# Linux
-sudo apt-get install ffmpeg
-
-# Windows
-# Download from https://ffmpeg.org/download.html
-```
+---
 
 ## 💻 Usage
 
-### Basic Usage
+### Basic Workflow
 
-1. **Prepare audio files**: Record play-by-play announcements following the standardized format (see [Announcement Format](#announcement-format))
-
-2. **Update main.py**: Set your audio file list
 ```python
+# 1. Prepare your audio files
 play_files = ["play1.mp3", "play2.mp3", "play3.mp3"]
-```
 
-3. **Run the program**:
-```bash
+# 2. Run SARG
 python3 main.py
+
+# 3. Watch the magic happen! ✨
 ```
 
-4. **View results**: The GUI will display the game state after each play
+### 🎙️ Announcement Format
 
-### Announcement Format
-
-Follow this format for consistent parsing:
+For best results, follow this structure:
 
 ```
 [Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score].
 ```
 
-**Examples:**
-```
-Marcus takes a ball. Count: 1-0. Bases empty. No outs. Score: 0-0.
+#### Examples
 
-Jessica hits a home run. Count: 0-0. Bases empty. No outs. Score: 2-0.
+| Play Type | Announcement |
+|-----------|-------------|
+| **Ball** | `Marcus takes a ball. Count: 1-0. Bases empty. No outs. Score: 0-0.` |
+| **Home Run** | `Jessica hits a home run. Count: 0-0. Bases empty. No outs. Score: 2-0.` |
+| **Ground Out** | `Chen grounds out to shortstop. Count: 0-0. Bases empty. 1 out. Score: 2-0.` |
+| **Double** | `Sarah doubles to left field. Count: 2-1. Runner on first. 1 out. Score: 3-1.` |
 
-Chen grounds out to shortstop. Count: 0-0. Bases empty. 1 out. Score: 2-0.
-```
-
-### Voice Commands
-
-- Say **"undo"** in an audio file to undo the last play
-- GUI undo button also available
+---
 
 ## 📁 Project Structure
 
 ```
 SARG-project/
-├── main.py              # Main entry point, orchestrates components
-├── gamestate.py         # Core game state management and logic
-├── schema.py            # Pydantic models for Play and RunnerMovement
-├── parse_play.py        # LLM-based play parsing with prompt
-├── speech.py            # Whisper transcription and cleaning
-├── userinterf.py        # PyQt5 GUI interface
-├── recorder.py          # Audio recording utilities (optional)
-├── README.md            # This file
-├── requirements.txt     # Python dependencies
-└── audio/              
-    ├── play1.mp3        # Test audio files
+│
+├── 🎯 main.py              # Entry point & orchestration
+├── 🎮 gamestate.py         # Core game logic
+├── 📋 schema.py            # Data models (Pydantic)
+├── 🧠 parse_play.py        # LLM play parser
+├── 🎤 speech.py            # Whisper transcription
+├── 🖥️ userinterf.py        # PyQt5 GUI
+├── 🎙️ recorder.py          # Audio utilities
+│
+├── 📖 README.md
+├── 📦 requirements.txt
+└── 📂 audio/
+    ├── play1.mp3
     ├── play2.mp3
     └── ...
 ```
 
+---
+
 ## 🔧 How It Works
 
-### 1. Audio Transcription (`speech.py`)
-- **Whisper** converts audio to text
-- **Clean**: Fixes common transcription errors (e.g., "basis" → "bases")
-- **Standardize**: Formats transcript to match expected pattern
+### The SARG Pipeline
 
-### 2. Play Parsing (`parse_play.py`)
-- **LangChain** + **Ollama** extract structured data
-- Prompt includes:
-  - Current game state context (who's on base, count, outs)
-  - Play type identification rules
-  - 9+ concrete examples for pattern matching
-- **Pydantic** validates output structure
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. AUDIO CAPTURE                                       │
+│  🎤 Record or load MP3 files                            │
+└───────────────────┬─────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────────────┐
+│  2. TRANSCRIPTION (Whisper)                             │
+│  🗣️  "Marcus hits a single to center field"            │
+│  🧹 Clean & standardize transcript                      │
+└───────────────────┬─────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────────────┐
+│  3. PARSING (LLM)                                       │
+│  🤖 Extract structured data:                            │
+│     • Play type: "single"                               │
+│     • Batter: "Marcus"                                  │
+│     • Runner movements                                  │
+└───────────────────┬─────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────────────┐
+│  4. STATE UPDATE                                        │
+│  🎮 Apply play to game state                            │
+│  ✅ Validate logic                                      │
+│  💾 Save to history                                     │
+└───────────────────┬─────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────────────┐
+│  5. DISPLAY                                             │
+│  🖥️  Update GUI scoreboard                             │
+│  📊 Show play-by-play                                   │
+└─────────────────────────────────────────────────────────┘
+```
 
-### 3. Game State Update (`gamestate.py`)
-- Validates play against current state
-- Applies runner movements
-- Updates count, outs, score
-- Handles special cases (sac fly, double play, inning change)
-- Stores play in history for undo/replay
-
-### 4. GUI Display (`userinterf.py`)
-- Shows live game state
-- Displays last 3 plays
-- Provides undo button with confirmation
-- Updates automatically after each play
+---
 
 ## 🧪 Testing
 
-### Test Play Sequences
-
-Run the included test sequences:
+### Run Test Sequences
 
 ```python
-# 12-play test (complete half-inning)
-play_files = ["test_play1.mp3", ..., "test_play12.mp3"]
+# Complete half-inning test (12 plays)
+play_files = [f"test_play{i}.mp3" for i in range(1, 13)]
+python3 main.py
 
-# Double play tests
-play_files = ["dp_setup.mp3", "dp_play.mp3"]
+# Expected final state:
+# AWAY: 3 | HOME: 0 | Inning: Bottom 1, Count: 0-0, Outs: 0
 ```
 
-### Jupyter Notebook Testing
+### Interactive Testing
 
-See `double_play_test.ipynb` for interactive testing:
+Use the included Jupyter notebook:
 
 ```python
 from gamestate import GameState
 from parse_play import parse_transcript
 
-# Test individual plays
+# Create game
 game = GameState("HOME", "AWAY")
+
+# Test a play
 play = parse_transcript("Marcus hits a single. Count: 0-0...")
 game.update(play)
 print(game)
 ```
 
-### Expected Outputs
+---
 
-After 12 test plays, final state should be:
-```
-AWAY: 3 | HOME: 0 | Inning: Bottom 1, Count: 0-0, Outs: 0 | Bases empty
-```
+## ⚠️ Known Limitations
 
-## 🐛 Known Issues & Limitations
-
-1. **LLM Accuracy**: Local llama3.1 model occasionally misparses complex plays
-2. **Audio Quality**: Whisper transcription quality depends on clear audio
-3. **Manual Transcripts**: System requires pre-recorded audio files (no live recording yet)
-4. **Double Plays**: Complex runner movements sometimes need manual correction
-5. **No Replay Analysis**: Can't easily visualize play history
-
-## 🚀 Future Work
-
-### Short-term Improvements
-- [ ] Add live audio recording mode
-- [ ] Implement GPT-4 mini for better parsing accuracy
-- [ ] Add pitch-level tracking (velocity, location)
-- [ ] Support for pinch hitters and substitutions
-
-### Long-term Goals
-- [ ] Real-time game streaming integration
-- [ ] Database storage (PostgreSQL) instead of JSON
-- [ ] Web dashboard for remote viewing
-- [ ] Statistical analysis and reports
-- [ ] Mobile app version
-- [ ] Support for other sports (basketball, football)
-
-## 📊 Performance
-
-- **Transcription**: ~2-5 seconds per play (Whisper base model)
-- **Parsing**: ~1-3 seconds per play (llama3.1)
-- **State Update**: <0.1 seconds
-- **Total**: ~3-8 seconds per play
-
-## 🤝 Contributors
-
-- **Your Name** - Initial development, core architecture
-- **Course**: [Course Name/Number]
-- **Institution**: [University Name]
-- **Semester**: Fall 2024
-
-## 📝 License
-
-This project is licensed for educational purposes.
-
-## 🙏 Acknowledgments
-
-- OpenAI Whisper for speech recognition
-- Ollama team for local LLM deployment
-- LangChain for LLM orchestration
-- PyQt5 for GUI framework
-
-## 📞 Contact
-
-For questions or issues, contact: [your-email@example.com]
+| Issue | Description | Workaround |
+|-------|-------------|------------|
+| 🎯 **LLM Accuracy** | Local model occasionally misparses complex plays | Use GPT-4 for critical games |
+| 🎤 **Audio Quality** | Depends on clear recordings | Use high-quality microphone |
+| 🔴 **No Live Mode** | Pre-recorded audio only | Future enhancement |
+| 🏃 **Complex Runners** | Double plays need manual check | Verify in GUI |
 
 ---
 
-**Note**: This is an academic project demonstrating the integration of speech recognition, natural language processing, and game state management. It is not intended for production use without significant additional testing and refinement.
+## 🚀 Roadmap
+
+### 📅 Phase 1: Core Improvements
+- [ ] Live audio recording mode
+- [ ] GPT-4 integration for better accuracy
+- [ ] Pitch tracking (velocity, location)
+- [ ] Player substitutions
+
+### 📅 Phase 2: Platform Expansion
+- [ ] Web dashboard
+- [ ] Mobile app (iOS/Android)
+- [ ] Database backend (PostgreSQL)
+- [ ] Multi-game tournament tracking
+
+### 📅 Phase 3: Advanced Features
+- [ ] Real-time streaming integration
+- [ ] Statistical analysis & reports
+- [ ] Support for other sports
+- [ ] Machine learning for play prediction
+
+---
+
+## 📊 Performance Metrics
+
+| Operation | Time | Technology |
+|-----------|------|------------|
+| 🎤 **Transcription** | 2-5s | Whisper (base) |
+| 🧠 **Parsing** | 1-3s | llama3.1 |
+| ⚡ **State Update** | <0.1s | Python |
+| **Total** | **3-8s per play** | - |
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+1. 🍴 Fork the repository
+2. 🌿 Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. 💾 Commit your changes (`git commit -m 'Add amazing feature'`)
+4. 📤 Push to the branch (`git push origin feature/amazing-feature`)
+5. 🎉 Open a Pull Request
+
+---
+
+## 📚 Tech Stack
+
+<div align="center">
+
+| Category | Technologies |
+|----------|-------------|
+| **AI/ML** | ![OpenAI](https://img.shields.io/badge/OpenAI-Whisper-412991?logo=openai) ![Ollama](https://img.shields.io/badge/Ollama-llama3.1-000000) |
+| **Framework** | ![LangChain](https://img.shields.io/badge/LangChain-🦜-green) ![PyQt5](https://img.shields.io/badge/PyQt5-GUI-41CD52?logo=qt) |
+| **Language** | ![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white) |
+| **Storage** | ![JSON](https://img.shields.io/badge/JSON-Storage-000000?logo=json) |
+
+</div>
+
+---
+
+## 📝 License
+
+This project is licensed for **educational purposes**.
+
+---
+
+## 🙏 Acknowledgments
+
+Special thanks to:
+
+- 🤖 **OpenAI** for Whisper speech recognition
+- 🦙 **Ollama** team for local LLM deployment
+- 🦜 **LangChain** for LLM orchestration
+- 🖥️ **PyQt5** for the GUI framework
+- ⚾ **Baseball enthusiasts** everywhere
+
+---
+
+<div align="center">
+
+**Built with ❤️ for the love of baseball and AI**
+
+*Fall 2024 Academic Project*
+
+[Report Bug](https://github.com/yourusername/sarg/issues) • [Request Feature](https://github.com/yourusername/sarg/issues) • [Documentation](https://github.com/yourusername/sarg/wiki)
+
+</div>
