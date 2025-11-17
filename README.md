@@ -315,7 +315,7 @@ We welcome contributions! Here's how you can help:
 
 | Category | Technologies |
 |----------|-------------|
-| **AI/ML** | ![OpenAI](https://img.shields.io/badge/OpenAI-Whisper-412991?logo=openai) ![Ollama](https://img.shields.io/badge/Ollama-llama3.1-000000) |
+| **AI/ML** | ![OpenAI](https://img.shields.io/badge/OpenAI-Whisper-412991?logo=openai) ![Ollama]|
 | **Framework** | ![LangChain](https://img.shields.io/badge/LangChain-🦜-green) ![PyQt5](https://img.shields.io/badge/PyQt5-GUI-41CD52?logo=qt) |
 | **Language** | ![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white) |
 | **Storage** | ![JSON](https://img.shields.io/badge/JSON-Storage-000000?logo=json) |
