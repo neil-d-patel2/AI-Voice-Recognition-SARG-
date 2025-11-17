@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚾ AI Scorekeeping
+# ⚾ AI Scorekeeping.
 
 ### Speech-Automated Real-time Game Tracker
 
