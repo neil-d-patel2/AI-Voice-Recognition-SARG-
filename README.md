@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚾ SARG
+# ⚾ AI Scorekeeping
 
 ### Speech-Automated Real-time Game Tracker
 
@@ -16,13 +16,13 @@
 
 </div>
 
-## 🎯 What is SARG?
+## 🎯 What is AI VR?
 
-SARG transforms the way baseball games are scored by combining **speech recognition** and **natural language processing** to automatically track every play, every out, every run—all from voice announcements.
+AIVR transforms the way baseball games are scored by combining **speech recognition** and **natural language processing** to automatically track every play, every out, every run—all from voice announcements.
 
-Simply speak the play, and SARG does the rest.
+Simply speak the play, and we does the rest.
 
-### ✨ Why SARG?
+### ✨ Why?
 
 - 🎤 **Voice-First**: No more manual scorekeeping—just speak naturally
 - 🧠 **AI-Powered**: Uses OpenAI Whisper + Local LLM for intelligent parsing
@@ -262,8 +262,6 @@ print(game)
 | 🎯 **LLM Accuracy** | Local model occasionally misparses complex plays | Use GPT-4 for critical games |
 | 🎤 **Audio Quality** | Depends on clear recordings | Use high-quality microphone |
 | 🔴 **No Live Mode** | Pre-recorded audio only | Future enhancement |
-| 🏃 **Complex Runners** | Double plays need manual check | Verify in GUI |
-
 ---
 
 ## 🚀 Roadmap
@@ -346,10 +344,6 @@ Special thanks to:
 
 <div align="center">
 
-**Built with ❤️ for the love of baseball and AI**
-
-*Fall 2024 Academic Project*
-
-[Report Bug](https://github.com/yourusername/sarg/issues) • [Request Feature](https://github.com/yourusername/sarg/issues) • [Documentation](https://github.com/yourusername/sarg/wiki)
+**Any questions, email npate137@jh.edu**
 
 </div>
