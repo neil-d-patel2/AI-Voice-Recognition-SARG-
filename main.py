@@ -3,24 +3,21 @@ import shutil
 import os
 import subprocess
 import sys
+import warnings
 from gamestate import GameState
 from parse_play import parse_transcript
 from speech import transcribe_audio, clean_transcript, standardize_transcript
 from recorder import record_audio
 from userinterf import GameGUI, QApplication
-import warnings
 from urllib3.exceptions import NotOpenSSLWarning
 from fix_hit_info import fix_play_info
 from extract_bases import extract_bases
 
+warnings.filterwarnings("ignore", category=NotOpenSSLWarning)   
+sys.stderr = open(os.devnull, "w")
 
-#Prompt for a play every single time, then go through the logic
-#Dont automatically prompt for the play, but have a feature that allows for the current state of the game to be printed
-#also allow for the entire history to be printed as well
-warnings.filterwarnings(
-    "ignore",
-    category=NotOpenSSLWarning
-)
+
+
 
 app = QApplication(sys.argv)
 game = GameState(home_team="HOME", away_team="AWAY")
@@ -30,33 +27,23 @@ gui.show()
 
 play_files = ["direction1.mp3","direction2.mp3", "direction3.mp3", "direction4.mp3", "direction5.mp3"]
 
-all_game_states = []
-''' Have a while loop that prompts for plays, 
-    append it to play files that can be printed,
-    print gui, then prompt for another play
-    until the game ends. 
-'''
-mp3_folder = "s1"
 
-#for plays in play_files if in list 
 
 for plays in play_files:
      transcript = transcribe_audio(plays)
      transcript = clean_transcript(transcript)
      transcript = standardize_transcript(transcript)
-     
+     #undo the last play if a transcript contains "undo"
      if "undo" in transcript.lower():
         print("🔄 UNDO command detected!")
         if game.undo_last_play():
-             print("✅ Successfully undid last play")
+             print("Successfully undid last play")
              gui.update_display()
         else:
-             print("❌ No plays to undo")
+             print("No plays to undo")
         continue
     
      # Skip to next audio file 
-     # CRITICAL FIX: Pass current game state context to parser
-     # This lets the LLM know who's on base and the current count
      current_bases = game.bases.snapshot()
      current_count = f"{game.balls}-{game.strikes}"
      current_outs = game.outs
