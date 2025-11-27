@@ -1,34 +1,46 @@
-# Ignore your specific notebook
-test.ipynb
-
-# ---- Python ----
+Perfect! Here's a .gitignore that hides those specific files:
+bashcat > .gitignore << 'EOF'
+# Python cache and compiled files
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.pdb
+*.py[cod]
+*$py.class
 *.so
-*.egg-info/
+.Python
 
 # Virtual environments
 venv/
 env/
-*.venv/
+ENV/
 
-# Jupyter + data outputs
-.ipynb_checkpoints/
-*.ipynb
-
-# Ignore large data files
-*.csv
-*.tsv
-*.json
-*.sqlite
-*.db
-
-# ---- OS / Editor ----
-.DS_Store
-Thumbs.db
-
-# VSCode
+# IDE settings
 .vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Audio files (large binaries)
+*.mp3
+*.wav
+*.m4a
+
+# Object/compiled files - HIDE THESE SPECIFIC FILES
+play
+parse_play
+
+# Jupyter notebooks - HIDE THIS SPECIFIC FILE
+test.ipynb
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs and databases
+*.log
+*.db
+*.sqlite
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+EOF
