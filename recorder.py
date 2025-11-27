@@ -1,5 +1,6 @@
 import subprocess
 
+
 def record_audio():
     # ask user for a filename
     filename = input("Enter a name for your recording (without .mp3): ").strip()
@@ -10,10 +11,13 @@ def record_audio():
     # ffmpeg command for macOS (avfoundation)
     cmd = [
         "ffmpeg",
-        "-f", "avfoundation",
-        "-i", ":0",
-        "-acodec", "libmp3lame",
-        output_file
+        "-f",
+        "avfoundation",
+        "-i",
+        ":0",
+        "-acodec",
+        "libmp3lame",
+        output_file,
     ]
 
     try:
@@ -23,6 +27,7 @@ def record_audio():
         print("\nStopped recording.")
 
     return output_file
+
 
 if __name__ == "__main__":
     # when run directly, record and print filename

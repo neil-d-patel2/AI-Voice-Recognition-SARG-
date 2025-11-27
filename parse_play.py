@@ -122,19 +122,15 @@ KEY REMINDERS:
 )
 
 
-llm = OllamaLLM(
-    model="llama3.1",
-    temperature=0,
-    top_p=1,
-    repeat_penalty=1,
-    mirostat=0
-   )
+llm = OllamaLLM(model="llama3.1", temperature=0, top_p=1, repeat_penalty=1, mirostat=0)
 
 chain = prompt | llm | parser
+
 
 def parse_transcript(transcript_text: str):
     result = chain.invoke({"transcript": transcript_text})
     return result
+
 
 # Example use
 if __name__ == "__main__":

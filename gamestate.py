@@ -6,10 +6,11 @@ from schema import Play, RunnerMovement
 
 
 class BatterState:
-    '''
+    """
     Holds the state of the batter during an at-bat.
     Eventually will be stored in a db similar to GameDay.
-    '''
+    """
+
     def __init__(self, player_name: str):
         self.player_name = player_name
         self.strikes = 0
@@ -18,7 +19,7 @@ class BatterState:
         self.at_bats = 0
         self.hits = 0
         self.runs = 0
-        self.rbis = 0 
+        self.rbis = 0
 
     def record_pitch(self, pitch_type: str):
         """Record pitch result and update count"""
@@ -38,12 +39,17 @@ class BatterState:
 
 
 class Bases:
-    '''
+    """
     Bases state management for a baseball game.
     Updated automatically after parsing.
-    '''    
+    """
+
     def __init__(self):
-        self.state: Dict[str, Optional[str]] = {"first": None, "second": None, "third": None}
+        self.state: Dict[str, Optional[str]] = {
+            "first": None,
+            "second": None,
+            "third": None,
+        }
 
     def clear(self):
         """Clear all bases"""
@@ -75,9 +81,10 @@ class Bases:
 
 
 class Inning:
-    '''
+    """
     Manages the game state (top and bottom of innings).
-    '''
+    """
+
     def __init__(self):
         self.number: int = 1
         self.top: bool = True
@@ -95,9 +102,10 @@ class Inning:
 
 
 class Team:
-    '''
+    """
     Represents a baseball team with name and runs scored.
-    '''
+    """
+
     def __init__(self, name: str):
         self.name: str = name
         self.runs: int = 0
@@ -115,9 +123,10 @@ class Team:
 
 
 class GameState:
-    '''
-    Manages the overall state of a baseball game with underlying logic. 
-    '''
+    """
+    Manages the overall state of a baseball game with underlying logic.
+    """
+
     def __init__(self, home_team: str, away_team: str):
         self.home = Team(home_team)
         self.away = Team(away_team)
@@ -221,19 +230,26 @@ class GameState:
         if not getattr(play, "play_type", None):
             return False, "Play type is required"
 
-        if not isinstance(play.outs_made, int) or play.outs_made < 0 or play.outs_made > 3:
+        if (
+            not isinstance(play.outs_made, int)
+            or play.outs_made < 0
+            or play.outs_made > 3
+        ):
             return False, f"Invalid outs_made: {play.outs_made} (must be 0-3)"
 
         if not isinstance(play.runs_scored, int) or play.runs_scored < 0:
             return False, f"Invalid runs_scored: {play.runs_scored} (must be >= 0)"
 
         if self.outs + play.outs_made > 3:
-            return False, f"Too many outs: current={self.outs}, play adds={play.outs_made}"
+            return (
+                False,
+                f"Too many outs: current={self.outs}, play adds={play.outs_made}",
+            )
 
         # Validate special play types
         if play.play_type == "double_play" and play.outs_made != 2:
             return False, f"Double play must have outs_made=2, got {play.outs_made}"
-        
+
         if play.play_type == "triple_play" and play.outs_made != 3:
             return False, f"Triple play must have outs_made=3, got {play.outs_made}"
 
@@ -260,13 +276,17 @@ class GameState:
         preview.append(f"  Type: {play.play_type}")
         preview.append(f"  Count: {self.balls}-{self.strikes}")
         preview.append(f"  Outs: {self.outs} → {self.outs + play.outs_made}")
-        preview.append(f"  Runs (batting team): {self.batting_team().runs} → {self.batting_team().runs + play.runs_scored}")
+        preview.append(
+            f"  Runs (batting team): {self.batting_team().runs} → {self.batting_team().runs + play.runs_scored}"
+        )
         preview.append(f"  Current bases: {self.bases.snapshot()}")
 
         if play.runners:
             preview.append("  Runner movements:")
             for move in play.runners:
-                preview.append(f"    {move.player or '<unknown>'}: {move.start_base} -> {move.end_base}")
+                preview.append(
+                    f"    {move.player or '<unknown>'}: {move.start_base} -> {move.end_base}"
+                )
 
         return "\n".join(preview)
 
@@ -298,7 +318,7 @@ class GameState:
             elif end == "out":
                 if start in ["first", "second", "third"]:
                     self.bases.clear_base(start)
-        
+
         if runs_scored > 0:
             self.add_runs(runs_scored)
 
@@ -324,7 +344,7 @@ class GameState:
     def update(self, play: Play, validate: bool = True):
         """
         Apply a play to the game state.
-        
+
         Args:
             play: Play object to apply
             validate: Whether to validate play before applying (default True)
@@ -361,10 +381,10 @@ class GameState:
             self.bases.state = play.bases_after.copy()
 
         # Update outs to match transcript exactly
-        if play.outs_after_play is not None:      
+        if play.outs_after_play is not None:
             self.outs += play.outs_made
 
-        ''' 
+        """ 
          if play.runners:
             self._apply_runner_movements(play)
         else:
@@ -379,7 +399,7 @@ class GameState:
         elif play.play_type in ["walk", "strikeout", "ground_out", "fly_out", "line_out", "pop_out", "double_play", "triple_play"]:
                  self.reset_count()
         Commenting this block to see if LLM handles movements properly
-        '''
+        """
 
     def undo_last_play(self) -> bool:
         """
@@ -393,7 +413,7 @@ class GameState:
         home_name = self.home.name
         away_name = self.away.name
         history_to_replay = list(self.history)
-        
+
         # Reset game state
         self.__init__(home_team=home_name, away_team=away_name)
         # Replay all plays except the removed one
@@ -402,19 +422,19 @@ class GameState:
 
         print(f"UNDO: removed play {removed.play_type}")
         return True
-    
+
     def get_last_n_plays(self, n: int = 3) -> List[str]:
         """Get formatted descriptions of last N plays"""
         if not self.history:
             return ["No plays yet"]
-        
+
         last_plays = self.history[-n:]
         formatted = []
         for i, play in enumerate(reversed(last_plays), 1):
             formatted.append(f"{i}. {self._format_play_description(play)}")
-        
+
         return formatted
-    
+
     def _format_play_description(self, play: Play) -> str:
         """
         Return only the hit type and hit direction as a string.
@@ -429,10 +449,12 @@ class GameState:
             "fly_ball": "Fly ball",
             "line_drive": "Line drive",
             "popup": "Popup",
-            "bunt": "Bunt"
+            "bunt": "Bunt",
         }
 
-        hit_type_str = hit_type_map.get(play.hit_type, play.hit_type.replace("_", " ").title())
+        hit_type_str = hit_type_map.get(
+            play.hit_type, play.hit_type.replace("_", " ").title()
+        )
 
         # Format hit direction
         direction_str = ""
@@ -478,7 +500,7 @@ class GameState:
         game.balls = data.get("balls", 0)
         game.strikes = data.get("strikes", 0)
         game.bases.state = data["bases"]
-        
+
         # Restore play history
         for pd in data.get("history", []):
             try:
@@ -497,7 +519,11 @@ class GameState:
                 bases_str.append(f"{base}: {runner}")
         bases_display = ", ".join(bases_str) if bases_str else "Bases empty"
 
-        last_play_desc = self._format_play_description(self.history[-1]) if self.history else "No plays yet"
+        last_play_desc = (
+            self._format_play_description(self.history[-1])
+            if self.history
+            else "No plays yet"
+        )
 
         return (
             f"{self.away} | {self.home} | "
@@ -505,7 +531,7 @@ class GameState:
             f"Outs: {self.outs} | {bases_display}\n"
             f"Hit type and direction: {last_play_desc}"
         )
-        
+
     def snapshot(self) -> str:
         """
         Return a string snapshot of the current game state.
@@ -518,7 +544,11 @@ class GameState:
                 bases_str.append(f"{base}: {runner}")
         bases_display = ", ".join(bases_str) if bases_str else "Bases empty"
 
-        last_play_desc = self._format_play_description(self.history[-1]) if self.history else "No plays yet"
+        last_play_desc = (
+            self._format_play_description(self.history[-1])
+            if self.history
+            else "No plays yet"
+        )
 
         return (
             f"{self.away} | {self.home} | "

@@ -1,6 +1,7 @@
 # fix_play_info.py
 from schema import Play
 
+
 def fix_play_info(play: Play, transcript: str) -> Play:
     """
     Updates a Play object with:
@@ -43,7 +44,7 @@ def fix_play_info(play: Play, transcript: str) -> Play:
         ("balk", "balk"),
         ("substitution", "substitution"),
         ("pitching change", "pitching_change"),
-        ("in play", "in_play")
+        ("in play", "in_play"),
     ]
 
     for keyword, pt in play_type_map:
@@ -75,7 +76,7 @@ def fix_play_info(play: Play, transcript: str) -> Play:
         "center field": "cf",
         "right field": "rf",
         "pitcher": "p",
-        "catcher": "c"
+        "catcher": "c",
     }
     play.hit_direction = None
     for word, abbr in direction_map.items():
