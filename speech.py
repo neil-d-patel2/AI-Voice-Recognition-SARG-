@@ -6,7 +6,7 @@ def transcribe_audio(file_path: str) -> str:
     model = whisper.load_model("base")
     # can start off by creating a kvp of incorrect terms that we commonly see
     # such as basis and bases being incorrect 
-    '''
+    ''' 
     this prompt string will be used to make sure the model expects baseball speech.
     Along side the common mistakes that we will be appending in the future everytime we 
     see a language error that is effecting our program, it will be a big help. 
@@ -53,6 +53,8 @@ COMMON_MISTAKES = {
     "one first": "on first",
     "2 out": "2 outs",
     "line drive two center field": "line drive to center field",
+    "score 3 two 0": "score 3-0",
+    "zero zero": "0-0",
 }
 
 

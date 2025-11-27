@@ -1,8 +1,9 @@
-# play_schema.py
+# schema.py - Pydantic data models for baseball plays
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal
-#
+
 BaseName = Optional[str]
+
 
 class RunnerMovement(BaseModel):
     """Represents the movement of a runner during a play."""
@@ -12,6 +13,7 @@ class RunnerMovement(BaseModel):
     end_base: Optional[Literal["out","none","first","second","third","home"]] = Field(
         ..., description="Where the runner ended after the play (or 'out')")
 
+
 class Play(BaseModel):
     """
     A Play represents either:
@@ -19,6 +21,8 @@ class Play(BaseModel):
     2. A completed at-bat result (hit, out, walk, etc.) - ends at-bat and resets count
     3. Other game events (stolen base, substitution, etc.)
     """
+    
+    # Hit contact information
     hit_type: Optional[Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt"]] = Field(
         None, description="Type of contact made (ground ball, fly ball, line drive, popup, bunt)"
     )
@@ -26,6 +30,7 @@ class Play(BaseModel):
         None, description="Direction of hit (e.g., 'to shortstop', 'to center field')"
     ) 
 
+    # Play type - what actually happened
     play_type: Literal[
         # Individual pitch results (at_bat_complete = False)
         "ball",              # Pitch outside zone, no swing
@@ -62,14 +67,9 @@ class Play(BaseModel):
         )
     )
     
+    # Players involved
     batter: Optional[str] = Field(None, description="Batter name or number")
     pitcher: Optional[str] = Field(None, description="Pitcher name or number")
-    
-    # Hit type information (describes the contact made)
-    hit_type: Optional[Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt"]] = Field(
-        None, 
-        description="Type of contact made (e.g., ground ball, fly ball, line drive, popup, bunt)"
-    )
     
     # Count information (present after pitch-type plays)
     balls: Optional[int] = Field(None, description="Balls in count after this play (0-4)")
