@@ -361,9 +361,9 @@ class GameState:
             event, should_continue = self.record_pitch(pitch_type, play.batter)
             # Override count with transcript values if provided
             if play.balls is not None:
-                self.balls = max(self.balls, min(play.balls, 3))
+                self.balls = (min(play.balls, 3))
             if play.strikes is not None:
-                self.strikes = max(self.strikes, min(play.strikes, 2))
+                self.strikes = (min(play.strikes, 2))
             return
 
         # Handle home runs specially

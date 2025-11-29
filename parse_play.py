@@ -24,7 +24,7 @@ CRITICAL PARSING RULES:
 
 2. ACTION determines play_type (look for these phrases):
    - "takes a ball" → ball
-   - "swings and misses" or "Swings and misses" → swinging_strike
+   - "swings and misses" or "Swings and misses" or "swinging strike" → swinging_strike
    - "called strike" → called_strike
    - "fouls it off" or "fouls" → foul
    - "hits a single" → single
