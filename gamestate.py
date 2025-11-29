@@ -8,7 +8,6 @@ from schema import Play, RunnerMovement
 class BatterState:
     """
     Holds the state of the batter during an at-bat.
-    Eventually will be stored in a db similar to GameDay.
     """
 
     def __init__(self, player_name: str):
