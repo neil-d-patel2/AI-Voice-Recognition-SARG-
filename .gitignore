@@ -26,9 +26,6 @@ ENV/
 play
 parse_play
 
-# Jupyter notebooks - HIDE THIS SPECIFIC FILE
-test.ipynb
-
 # Jupyter checkpoints
 .ipynb_checkpoints/
 *.ipynb_checkpoints
