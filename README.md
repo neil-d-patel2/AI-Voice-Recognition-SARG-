@@ -22,16 +22,6 @@ AIVR transforms the way baseball games are scored by combining **speech recognit
 
 Simply speak the play, and we does the rest.
 
-### ✨ Why?
-
-- 🎤 **Voice-First**: No more manual scorekeeping—just speak naturally
-- 🧠 **AI-Powered**: Uses OpenAI Whisper + Local LLM for intelligent parsing
-- ⚡ **Real-Time**: Instant updates to game state with every play
-- 🔄 **Undo Support**: Made a mistake? Just say "undo" or click a button
-- 💾 **Persistent**: Save and load games seamlessly
-
----
-
 ## 🌟 Features
 
 <table>
@@ -48,10 +38,10 @@ Simply speak the play, and we does the rest.
 </td>
 <td width="50%">
 
-### Advanced Features
+### Features
 - 🎙️ Voice command recognition
 - 🤖 LLM-based natural language parsing
-- 🖥️ Live GUI with PyQt5
+- 🖥️ Live GUI after each run 
 - 📝 JSON persistence
 - 🔙 Multi-level undo system
 
@@ -86,9 +76,8 @@ graph TB
 |-----------|-----------|---------|
 | **Speech Recognition** | OpenAI Whisper | Converts audio to text |
 | **NLP Parser** | LangChain + Ollama | Extracts structured play data |
-| **Game Logic** | Python + Pydantic | Manages state and validation |
+| **Game Logic** | Pydantic | Manages state and validation |
 | **Interface** | PyQt5 | Visual scoreboard display |
-| **Storage** | JSON | Persistent game data |
 
 </details>
 
@@ -135,10 +124,10 @@ brew install ffmpeg  # macOS
 # 1. Prepare your audio files
 play_files = ["play1.mp3", "play2.mp3", "play3.mp3"]
 
-# 2. Run SARG
+# 2. Run the program
 python3 main.py
 
-# 3. Watch the magic happen! ✨
+# 3. Watch the scorekeeping output
 ```
 
 ### 🎙️ Announcement Format
@@ -149,7 +138,7 @@ For best results, follow this structure:
 [Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score].
 ```
 
-#### Examples
+#### Examples (More ambiguity coming soon)
 
 | Play Type | Announcement |
 |-----------|-------------|
@@ -157,6 +146,7 @@ For best results, follow this structure:
 | **Home Run** | `Jessica hits a home run. Count: 0-0. Bases empty. No outs. Score: 2-0.` |
 | **Ground Out** | `Chen grounds out to shortstop. Count: 0-0. Bases empty. 1 out. Score: 2-0.` |
 | **Double** | `Sarah doubles to left field. Count: 2-1. Runner on first. 1 out. Score: 3-1.` |
+
 
 ---
 
@@ -183,9 +173,7 @@ SARG-project/
 
 ---
 
-## 🔧 How It Works
-
-### The SARG Pipeline
+### The Pipeline
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -236,55 +224,6 @@ python3 main.py
 # AWAY: 3 | HOME: 0 | Inning: Bottom 1, Count: 0-0, Outs: 0
 ```
 
-### Interactive Testing
-
-Use the included Jupyter notebook:
-
-```python
-from gamestate import GameState
-from parse_play import parse_transcript
-
-# Create game
-game = GameState("HOME", "AWAY")
-
-# Test a play
-play = parse_transcript("Marcus hits a single. Count: 0-0...")
-game.update(play)
-print(game)
-```
-
----
-
-## ⚠️ Known Limitations
-
-| Issue | Description | Workaround |
-|-------|-------------|------------|
-| 🎯 **LLM Accuracy** | Local model occasionally misparses complex plays | Use GPT-4 for critical games |
-| 🎤 **Audio Quality** | Depends on clear recordings | Use high-quality microphone |
-| 🔴 **No Live Mode** | Pre-recorded audio only | Future enhancement |
----
-
-## 🚀 Roadmap
-
-### 📅 Phase 1: Core Improvements
-- [ ] Live audio recording mode
-- [ ] GPT-4 integration for better accuracy
-- [ ] Pitch tracking (velocity, location)
-- [ ] Player substitutions
-
-### 📅 Phase 2: Platform Expansion
-- [ ] Web dashboard
-- [ ] Mobile app (iOS/Android)
-- [ ] Database backend (PostgreSQL)
-- [ ] Multi-game tournament tracking
-
-### 📅 Phase 3: Advanced Features
-- [ ] Real-time streaming integration
-- [ ] Statistical analysis & reports
-- [ ] Support for other sports
-- [ ] Machine learning for play prediction
-
----
 
 ## 📊 Performance Metrics
 
@@ -309,16 +248,6 @@ print(game)
 | **Storage** | ![JSON](https://img.shields.io/badge/JSON-Storage-000000?logo=json) |
 
 </div>
-
----
-
-## 📝 License
-
-This project is licensed for **educational purposes**.
-
----
-
-
 
 <div align="center">
 
