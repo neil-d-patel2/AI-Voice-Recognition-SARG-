@@ -449,6 +449,7 @@ class GameState:
             "line_drive": "Line drive",
             "popup": "Popup",
             "bunt": "Bunt",
+            "pop_out": "Pop out"
         }
 
         hit_type_str = hit_type_map.get(

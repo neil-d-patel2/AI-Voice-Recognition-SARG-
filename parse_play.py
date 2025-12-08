@@ -102,7 +102,10 @@ CRITICAL PARSING RULES:
        * hit_type: "line_drive", hit_direction: "center field"
        * hit_type: null, hit_direction: null
 
-
+11. SCORE:
+    - **CRITICAL**: If the transcript does NOT explicitly mention or change the score (e.g., only says "Score: X-Y"), you MUST NOT include the score in the final JSON output.
+    - Only parse or update the score if a run is definitively scored (e.g., Home Run, Sac Fly) AND the new score is confirmed in the transcript.
+    - If no runs are scored AND the transcript does not confirm a new score, assume score remains unchanged and OMIT the score field from the final JSON.
 
 EXAMPLES (MATCH THESE PATTERNS EXACTLY):
 [Keep all your previous examples from Example 1 → Example 9, same as before]

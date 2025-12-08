@@ -16,7 +16,6 @@ from fix_hit_info import fix_play_info, extract_bases
 warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
 sys.stderr = open(os.devnull, "w")
 
-
 # Initialize PyQt5 application
 app = QApplication(sys.argv)
 
@@ -28,18 +27,11 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = [
-    "direction1.mp3",
-    "direction2.mp3",
-    "direction3.mp3",
-    "direction4.mp3",
-    "direction5.mp3",
-]
+play_files = ["direction1.mp3"]
 
 # Storage for outputs
 all_game_states = []
 all_transcripts = []
-
 # Process each audio file
 for plays in play_files:
     # Step 1: Transcribe audio to text using Whisper
@@ -61,7 +53,6 @@ for plays in play_files:
     current_bases = game.bases.snapshot()
     current_count = f"{game.balls}-{game.strikes}"
     current_outs = game.outs
-
     # Add context to transcript for better parsing
     context_info = (
         f"\nCurrent game state - Count: {current_count}, Outs: {current_outs}"
