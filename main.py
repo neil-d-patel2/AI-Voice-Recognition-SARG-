@@ -14,6 +14,7 @@ from urllib3.exceptions import NotOpenSSLWarning
 from fix_hit_info import fix_play_info, extract_bases
 
 # Suppress SSL warnings
+# source ~/.zshrc to activate environment
 warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
 sys.stderr = open(os.devnull, "w")
 
