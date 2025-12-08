@@ -13,10 +13,9 @@ from userinterf import GameGUI, QApplication
 from urllib3.exceptions import NotOpenSSLWarning
 from fix_hit_info import fix_play_info, extract_bases
 
-# Suppress SSL warnings
-# source ~/.zshrc to activate environment
 warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
 sys.stderr = open(os.devnull, "w")
+
 
 # Initialize PyQt5 application
 app = QApplication(sys.argv)
@@ -76,12 +75,12 @@ for plays in play_files:
         context_info += ", Bases empty"
 
     transcript_with_context = transcript + context_info
-
     # Step 2: Parse transcript into structured Play object using LLM
     play = parse_transcript(transcript)
     play = fix_play_info(play, transcript)  # Extract hit type/direction
     play = extract_bases(play, transcript)  # Extract base state
     print(play)
+ 
 
     # Debug output (commented out)
     """print(f"DEBUG Play object: {play}")
