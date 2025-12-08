@@ -16,6 +16,10 @@ from fix_hit_info import fix_play_info, extract_bases
 warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
 sys.stderr = open(os.devnull, "w")
 
+
+#eval "$(pyenv init --path)" if necessary to start the pyenv python version.
+
+
 # Initialize PyQt5 application
 app = QApplication(sys.argv)
 
