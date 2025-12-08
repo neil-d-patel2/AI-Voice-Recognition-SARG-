@@ -34,8 +34,7 @@ COMMON_MISTAKES = {
     "basses": "bases",
     "Neal": "Neil",
     "Mrs": "misses",
-    "won": "one",
-    "to": "two",  # Context: "score away to" -> "score away two"
+    "won": "one",  
     "tree": "three",
     "for": "four",
     "nil": "zero",
@@ -55,7 +54,12 @@ COMMON_MISTAKES = {
     "line drive two center field": "line drive to center field",
     "score 3 two 0": "score 3-0",
     "zero zero": "0-0",
-    "bow": "Bo"
+    "bow": "Bo",
+    "filed": "field",
+    "two center": "to center",
+    "two right field": "to right field",
+    "Ride": "Right",
+    "both third": "Bo on third"
 }
 
 

@@ -93,7 +93,7 @@ CRITICAL PARSING RULES:
    - Otherwise, leave them null
    
 10. HIT_TYPE & HIT_DIRECTION (ALWAYS RETURN THESE FIELDS):
-   - The transcript may describe the hit with phrases like "ground ball", "fly ball", "line drive", "popup", or "bunt".
+   - The transcript may describe the hit with phrases like "ground ball", "fly ball", "line drive", "popup", "fly out", "pop out" "bunt".
    - Extract the HIT TYPE even if the main play_type is something else (e.g., "grounds into a double play" still includes "ground ball").
    - Extract the HIT DIRECTION whenever the transcript mentions a fielding location, such as "to shortstop", "to second base", "to left field", etc.
    - If the transcript does NOT mention these details, explicitly set both to null (not omitted).

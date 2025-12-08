@@ -32,7 +32,7 @@ class Play(BaseModel):
     )
     # Hit contact information
     hit_type: Optional[
-        Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt"]
+        Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt", "fly out"]
     ] = Field(
         None,
         description="Type of contact made (ground ball, fly ball, line drive, popup, bunt)",
