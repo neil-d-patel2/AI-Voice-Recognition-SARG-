@@ -393,6 +393,10 @@ class GameState:
         ):
             self.away_score = play.away_score_snapshot
             self.home_score = play.home_score_snapshot
+        #added this here
+        #clear bases, and mark that the half inning is ended after this
+        if self.outs >= 3:
+            self.bases.clear()
 
     def undo_last_play(self) -> bool:
         """

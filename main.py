@@ -20,6 +20,12 @@ sys.stderr = open(os.devnull, "w")
 #eval "$(pyenv init --path)" if necessary to start the pyenv python version.
 #format "[Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score]."
 # Initialize PyQt5 application
+
+'''
+recording plays
+say "Bo Bichette walks" -o temp.aiff
+ffmpeg -i temp.aiff play1.mp3
+'''
 app = QApplication(sys.argv)
 
 # Create game state with default teams
