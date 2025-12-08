@@ -151,8 +151,8 @@ class GameGUI(QWidget):
         """Update all labels based on current game state."""
         # Score
         self.score_label.setText(
-            f"{self.game_state.away.name}: {self.game_state.away.runs}  |  "
-            f"{self.game_state.home.name}: {self.game_state.home.runs}"
+            f"{self.game_state.away.name}: {self.game_state.get_away_score()}  |  "
+            f"{self.game_state.home.name}: {self.game_state.get_home_score()}"
         )
 
         # Inning

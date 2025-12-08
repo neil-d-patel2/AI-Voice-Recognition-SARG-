@@ -55,6 +55,7 @@ COMMON_MISTAKES = {
     "line drive two center field": "line drive to center field",
     "score 3 two 0": "score 3-0",
     "zero zero": "0-0",
+    "bow": "Bo"
 }
 
 

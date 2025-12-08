@@ -135,6 +135,10 @@ class GameState:
         self.balls: int = 0
         self.strikes: int = 0
         self.history: List[Play] = []
+        # Initialize scores
+
+        self.home_score: int = 0
+        self.away_score: int = 0
 
     def batting_team(self) -> Team:
         """Return team currently at bat"""
@@ -361,9 +365,9 @@ class GameState:
             event, should_continue = self.record_pitch(pitch_type, play.batter)
             # Override count with transcript values if provided
             if play.balls is not None:
-                self.balls = (min(play.balls, 3))
+                self.balls = min(play.balls, 3)
             if play.strikes is not None:
-                self.strikes = (min(play.strikes, 2))
+                self.strikes = min(play.strikes, 2)
             return
 
         # Handle home runs specially
@@ -382,6 +386,13 @@ class GameState:
         # Update outs to match transcript exactly
         if play.outs_after_play is not None:
             self.outs += play.outs_made
+
+        if (
+            play.away_score_snapshot is not None
+            and play.home_score_snapshot is not None
+        ):
+            self.away_score = play.away_score_snapshot
+            self.home_score = play.home_score_snapshot
 
         """ 
          if play.runners:
@@ -449,7 +460,7 @@ class GameState:
             "line_drive": "Line drive",
             "popup": "Popup",
             "bunt": "Bunt",
-            "pop_out": "Pop out"
+            "pop_out": "Pop out",
         }
 
         hit_type_str = hit_type_map.get(
@@ -510,6 +521,14 @@ class GameState:
                 pass  # Skip invalid plays
         return game
 
+    def get_away_score(self) -> int:
+        """Returns the current away team score."""
+        return self.away_score
+
+    def get_home_score(self) -> int:
+        """Returns the current home team score."""
+        return self.home_score
+
     def __str__(self):
         """Human-readable game state string"""
         bases_str = []
@@ -526,7 +545,7 @@ class GameState:
         )
 
         return (
-            f"{self.away} | {self.home} | "
+            f"Score: {self.away_score} - {self.home_score} | "
             f"Inning: {self.inning}, Count: {self.balls}-{self.strikes}, "
             f"Outs: {self.outs} | {bases_display}\n"
             f"Hit type and direction: {last_play_desc}"

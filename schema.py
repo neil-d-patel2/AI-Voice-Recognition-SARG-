@@ -24,7 +24,12 @@ class Play(BaseModel):
     2. A completed at-bat result (hit, out, walk, etc.) - ends at-bat and resets count
     3. Other game events (stolen base, substitution, etc.)
     """
-
+    away_score_snapshot: Optional[int] = Field(
+        None, description="The away team's score extracted directly from the transcript, if mentioned."
+    )
+    home_score_snapshot: Optional[int] = Field(
+        None, description="The home team's score extracted directly from the transcript, if mentioned."
+    )
     # Hit contact information
     hit_type: Optional[
         Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt"]

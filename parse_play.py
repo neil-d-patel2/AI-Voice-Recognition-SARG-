@@ -42,9 +42,29 @@ CRITICAL PARSING RULES:
 
 3. COUNT: Extract numbers from "Count: X-Y" or "count, X-Y" or "count, X Y"
    - Convert word numbers: zero→0, one→1, two→2, three→3
-   - **CRITICAL DEFAULT**: If the count is NOT mentioned in the transcript (e.g., no "Count: X-Y"), you MUST set balls and strikes both equal to 0.
    - Format is ALWAYS balls-strikes (first number = balls, second number = strikes)
    - Example: "count, zero one" = balls: 0, strikes: 1
+
+4. RUNNERS - THIS IS CRITICAL:
+   - ALWAYS check "Current game state" for who's on base BEFORE the play
+   - For batters: ALWAYS use start_base = "none" (NEVER use "batter" or "plate")
+   - For HITS: Batter goes from "none" to base (first/second/third)
+   - For HITS with runners: Advance runners based on hit type:
+     * Single: runners advance 1 base (first→second, second→third, third→home)
+     * Double: runners advance 2+ bases (first→third or home, second→home, third→home)
+     * Triple: ALL runners score (→home)
+     * Home run: ALL runners score including batter (→home)
+   - For OUTS (fly_out, ground_out, line_out, pop_out, strikeout):
+     * Usually NO runner movements (runners array empty)
+     * EXCEPTION: If runner on third AND fly_out → runner scores (third→home), runs_scored=1
+     * This is called a "sacrifice fly"
+   - For WALKS: Batter to first (none→first)
+   - For DOUBLE PLAYS:
+    * MUST have outs_made = 2
+    * Usually 2 runners with end_base = "out"
+    * Batter: start_base = "none", end_base = "out"
+    * Base runner: start_base = their base, end_base = "out"
+    * Example: DP with runner on first: [{{"player": "Runner", "start_base": "first", "end_base": "out"}}, {{"player": "Batter", "start_base": "none", "end_base": "out"}}]
 
 5. OUTS_MADE - SIMPLE RULE:
    - Pitches (ball, called_strike, swinging_strike, foul) → outs_made = 0
@@ -81,23 +101,28 @@ CRITICAL PARSING RULES:
        * hit_type: "ground_ball", hit_direction: "shortstop"
        * hit_type: "line_drive", hit_direction: "center field"
        * hit_type: null, hit_direction: null
-       * hit_type: pop out, hit_direction: null
-       
-11. COUNT:
+
+11. SCORE:
     - **CRITICAL**: If the transcript does NOT explicitly mention or change the score (e.g., only says "Score: X-Y"), you MUST NOT include the score in the final JSON output.
     - Only parse or update the score if a run is definitively scored (e.g., Home Run, Sac Fly) AND the new score is confirmed in the transcript.
     - If no runs are scored AND the transcript does not confirm a new score, assume score remains unchanged and OMIT the score field from the final JSON.
-    
-12. BASES AFTER PLAY:
-    - This rule is for explicitly stated base runners **after** the play, such as "Bases empty" or "Runner on first and third."
-    - **CRITICAL**: If the transcript explicitly states the runners' positions or base states *after* the play, you MUST parse this information into the optional `bases_after` field.
-    - If the transcript does NOT explicitly state the bases *after* the play, you MUST **OMIT** the `bases_after` field entirely.
-    - The `bases_after` field must be an object/dictionary listing bases with player names or `null`. Example: `{"first": "Player B", "second": null, "third": "Player A"}`
+   
+11. SCORE SNAPSHOT:
+   - The transcript often includes the current score (e.g., "Score: 1-3").
+   - **CRITICAL**: If the transcript explicitly mentions the score (e.g., "1-3"), you MUST parse the first number into `away_score_snapshot` and the second into `home_score_snapshot`.
+   - **OMISSION**: If the transcript does NOT mention the score, you MUST **OMIT** both `away_score_snapshot` and `home_score_snapshot` from the final JSON.
+   - This field is for reporting the score from the broadcast; it does NOT calculate runs scored.
+   - Example: "score 1-3" → away_score_snapshot: 1, home_score_snapshot: 3
 
+EXAMPLES (MATCH THESE PATTERNS EXACTLY):
+[Keep all your previous examples from Example 1 → Example 9, same as before]
 
+NOW PARSE THIS TRANSCRIPT:
+"{transcript}"
 
 KEY REMINDERS:
 - Extract count from "Count: X-Y" format
+- EXCEPTION: Fly out with runner on third → runner scores (sac fly)
 - Fouls ALWAYS get outs_made = 0
 - The outs mentioned in transcript = current game state, NOT this play's outs_made
 - Include hit_type and hit_direction when possible
@@ -113,30 +138,8 @@ chain = prompt | llm | parser
 
 
 def parse_transcript(transcript_text: str):
-   def parse_transcript(transcript_text: str):
-    try:
-        # Debug print to show where execution starts
-        print("--- DEBUG: Starting LLM invocation ---")
-        
-        # This is where the failure is occurring
-        result = chain.invoke({"transcript": transcript_text})
-        
-        # Debug print to show successful return (if reached)
-        print("--- DEBUG: LLM invocation successful ---")
-        return result
-    except Exception as e:
-        # 💥 CRITICAL: Print the exact error message that caused the crash.
-        print(f"\n❌ CRITICAL ERROR CAUGHT: The LangChain-Ollama interaction failed.")
-        print(f"Error Type: {type(e).__name__}")
-        print(f"Error Message: {e}")
-        
-        # Re-raise the exception to stop the main script cleanly
-        raise
-     
-    ''' 
     result = chain.invoke({"transcript": transcript_text})
     return result
-    '''
 
 
 # Example use

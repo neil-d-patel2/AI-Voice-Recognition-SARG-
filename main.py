@@ -30,7 +30,7 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["play1.mp3"]
+play_files = ["play1.mp3", "play2.mp3"]
 
 # Storage lists for outputs
 all_game_states = []
@@ -70,9 +70,7 @@ for plays in play_files:
 
     transcript_with_context = transcript + context_info
     # Step 2: Parse transcript into structured Play object using LLM
-    print("prints before parse transcript")
     play = parse_transcript(transcript)
-    print("but not after")
     play = fix_play_info(play, transcript)  # Extract hit type/direction
     play = extract_bases(play, transcript)  # Extract base state
     print(play)
@@ -101,7 +99,8 @@ for plays in play_files:
     print("\n Transcript:")
     print(transcript)
     print("\n")
-    all_transcripts.append(transcript)
+    game_str = str(game)
+    all_transcripts.append(game_str)
 
 # Undo testing code (commented out)
 """print(f"\nBefore undo:")
@@ -125,9 +124,7 @@ print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by
 print("=" * 60 + "\n")
 for states in all_game_states:
     print(states)
-for transcripts in all_transcripts:
-    print("\n Transcript")
-    print(transcripts)
+
 
 # Run GUI event loop
 sys.exit(app.exec())
