@@ -83,13 +83,12 @@ CRITICAL PARSING RULES:
        * hit_type: null, hit_direction: null
        * hit_type: pop out, hit_direction: null
        
-
 11. COUNT:
     - **CRITICAL**: If the transcript does NOT explicitly mention or change the score (e.g., only says "Score: X-Y"), you MUST NOT include the score in the final JSON output.
     - Only parse or update the score if a run is definitively scored (e.g., Home Run, Sac Fly) AND the new score is confirmed in the transcript.
     - If no runs are scored AND the transcript does not confirm a new score, assume score remains unchanged and OMIT the score field from the final JSON.
     
-12. BASES AFTER PLAY (Optional):
+12. BASES AFTER PLAY:
     - This rule is for explicitly stated base runners **after** the play, such as "Bases empty" or "Runner on first and third."
     - **CRITICAL**: If the transcript explicitly states the runners' positions or base states *after* the play, you MUST parse this information into the optional `bases_after` field.
     - If the transcript does NOT explicitly state the bases *after* the play, you MUST **OMIT** the `bases_after` field entirely.
@@ -114,8 +113,30 @@ chain = prompt | llm | parser
 
 
 def parse_transcript(transcript_text: str):
+   def parse_transcript(transcript_text: str):
+    try:
+        # Debug print to show where execution starts
+        print("--- DEBUG: Starting LLM invocation ---")
+        
+        # This is where the failure is occurring
+        result = chain.invoke({"transcript": transcript_text})
+        
+        # Debug print to show successful return (if reached)
+        print("--- DEBUG: LLM invocation successful ---")
+        return result
+    except Exception as e:
+        # 💥 CRITICAL: Print the exact error message that caused the crash.
+        print(f"\n❌ CRITICAL ERROR CAUGHT: The LangChain-Ollama interaction failed.")
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Message: {e}")
+        
+        # Re-raise the exception to stop the main script cleanly
+        raise
+     
+    ''' 
     result = chain.invoke({"transcript": transcript_text})
     return result
+    '''
 
 
 # Example use

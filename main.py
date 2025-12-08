@@ -70,9 +70,9 @@ for plays in play_files:
 
     transcript_with_context = transcript + context_info
     # Step 2: Parse transcript into structured Play object using LLM
-    print("prints")
+    print("prints before parse transcript")
     play = parse_transcript(transcript)
-    print("wont print")
+    print("but not after")
     play = fix_play_info(play, transcript)  # Extract hit type/direction
     play = extract_bases(play, transcript)  # Extract base state
     print(play)
