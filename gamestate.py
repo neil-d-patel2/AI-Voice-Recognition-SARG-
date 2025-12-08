@@ -394,23 +394,6 @@ class GameState:
             self.away_score = play.away_score_snapshot
             self.home_score = play.home_score_snapshot
 
-        """ 
-         if play.runners:
-            self._apply_runner_movements(play)
-        else:
-            self.bases.clear()
-        if play.outs_made > 0:
-            self.record_outs(play.outs_made)
-            
-        if play.play_type in ["single", "double", "triple"]:
-            if play.runners:
-                self._apply_batter_on_base(play)
-            self.reset_count()
-        elif play.play_type in ["walk", "strikeout", "ground_out", "fly_out", "line_out", "pop_out", "double_play", "triple_play"]:
-                 self.reset_count()
-        Commenting this block to see if LLM handles movements properly
-        """
-
     def undo_last_play(self) -> bool:
         """
         Undo the last play by replaying entire history without it.
