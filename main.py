@@ -18,8 +18,7 @@ sys.stderr = open(os.devnull, "w")
 
 
 #eval "$(pyenv init --path)" if necessary to start the pyenv python version.
-
-
+#format "[Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score]."
 # Initialize PyQt5 application
 app = QApplication(sys.argv)
 
@@ -31,9 +30,9 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["direction1.mp3"]
+play_files = ["play1.mp3"]
 
-# Storage for outputs
+# Storage lists for outputs
 all_game_states = []
 all_transcripts = []
 # Process each audio file
@@ -71,7 +70,9 @@ for plays in play_files:
 
     transcript_with_context = transcript + context_info
     # Step 2: Parse transcript into structured Play object using LLM
+    print("prints")
     play = parse_transcript(transcript)
+    print("wont print")
     play = fix_play_info(play, transcript)  # Extract hit type/direction
     play = extract_bases(play, transcript)  # Extract base state
     print(play)
