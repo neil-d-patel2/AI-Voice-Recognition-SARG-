@@ -26,6 +26,7 @@ recording plays
 say "Bo Bichette walks" -o temp.aiff
 ffmpeg -i temp.aiff play1.mp3
 '''
+
 app = QApplication(sys.argv)
 
 # Create game state with default teams
@@ -36,7 +37,7 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["play1.mp3", "play2.mp3", "play3.mp3", "play4.mp3", "play5.mp3", "play6.mp3"]
+play_files = ["output.mp3", "output1.mp3"]
 
 # Storage lists for outputs
 all_game_states = []
@@ -45,6 +46,7 @@ all_transcripts = []
 for plays in play_files:
     # Step 1: Transcribe audio to text using Whisper
     transcript = transcribe_audio(plays)
+    all_transcripts.append(transcript)
     transcript = clean_transcript(transcript)
     transcript = standardize_transcript(transcript)
 
@@ -94,7 +96,6 @@ for plays in play_files:
         game.update(play)
         print("Play applied successfully!")
         gui.refresh_after_play(play)
-        all_game_states.append(game.snapshot())
     except ValueError as e:
         print(f"Play validation failed: {e}")
         print("Check play")
@@ -106,7 +107,7 @@ for plays in play_files:
     print(transcript)
     print("\n")
     game_str = str(game)
-    all_transcripts.append(game_str)
+    all_game_states.append(game_str)
 
 # Undo testing code (commented out)
 """print(f"\nBefore undo:")
@@ -131,6 +132,9 @@ print("=" * 60 + "\n")
 for states in all_game_states:
     print(states)
 
-
+print("=============================")
+print("transcript for speech recognition errors")
+for transcripts in all_transcripts:
+    print(transcripts)
 # Run GUI event loop
 sys.exit(app.exec())
