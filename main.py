@@ -37,7 +37,7 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["output.mp3","output1.mp3","output2.mp3"]
+play_files = ["output.mp3","error_fixed.mp3","output1.mp3"]
 
 # Storage lists for outputs
 all_game_states = []
