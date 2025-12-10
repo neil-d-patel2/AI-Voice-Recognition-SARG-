@@ -47,6 +47,9 @@ CRITICAL PARSING RULES:
 
 4. RUNNERS - THIS IS CRITICAL:
    - ALWAYS check "Current game state" for who's on base BEFORE the play
+   - NEW CRITICAL RULE: You MUST include a RunnerMovement entry for every player whose name is mentioned with a base movement in the transcript (e.g., "Will to third").
+   - **CRITICAL EXPLICIT MOVEMENT:** If the transcript specifies a runner's movement (e.g., "Shohei moves to third," "Will to second"), you **MUST** create a RunnerMovement entry.
+   - **END BASE INSTRUCTION:** The base mentioned immediately following phrases like "moves to," "to," or "goes to" is the runner's **FINAL DESTINATION** and **MUST** be placed in the `end_base` field (e.g., "first", "second", "third", or "home").
    - For batters: ALWAYS use start_base = "none" (NEVER use "batter" or "plate")
    - For HITS: Batter goes from "none" to base (first/second/third)
    - For HITS with runners: Advance runners based on hit type:
@@ -54,10 +57,6 @@ CRITICAL PARSING RULES:
      * Double: runners advance 2+ bases (first→third or home, second→home, third→home)
      * Triple: ALL runners score (→home)
      * Home run: ALL runners score including batter (→home)
-   - For OUTS (fly_out, ground_out, line_out, pop_out, strikeout):
-     * Usually NO runner movements (runners array empty)
-     * EXCEPTION: If runner on third AND fly_out → runner scores (third→home), runs_scored=1
-     * This is called a "sacrifice fly"
    - For WALKS: Batter to first (none→first)
    - For DOUBLE PLAYS:
     * MUST have outs_made = 2
@@ -74,13 +73,15 @@ CRITICAL PARSING RULES:
    
 6. OUTS AFTER PLAY:
    - CRITICAL: Look for the total number of outs currently displayed in the transcript (e.g., "1 out", "2 outs", "No outs").
-   - Store this absolute number (0, 1, or 2) in the `outs_after_play` field.
+   - Store this absolute number (0, 1, 2, 3) in the `outs_after_play` field.
    - OMISSION: If the transcript does NOT explicitly mention the total number of outs after the play (e.g., just says "Ground ball"), you MUST **OMIT** the `outs_after_play` field from the final JSON.
    - Example: transcript says "2 out" → outs_after_play = 2
-   
+   - Example: transcript says **"three outs" → outs_after_play = 3**
+   You are asking to reinforce a rule that is already present in your prompt, but with a slight clarification on how to handle the outs_after_play field when the LLM cannot find the total outs number.
+
+
 7. RUNS_SCORED:
    - Count runners with end_base="home"
-   - Sacrifice fly: If runner on third, they score → runs_scored = 1
 
 8. AT_BAT_COMPLETE:
    - False: ball, called_strike, swinging_strike, foul
@@ -122,7 +123,6 @@ NOW PARSE THIS TRANSCRIPT:
 
 KEY REMINDERS:
 - Extract count from "Count: X-Y" format
-- EXCEPTION: Fly out with runner on third → runner scores (sac fly)
 - Fouls ALWAYS get outs_made = 0
 - The outs mentioned in transcript = current game state, NOT this play's outs_made
 - Include hit_type and hit_direction when possible

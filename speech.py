@@ -64,7 +64,13 @@ COMMON_MISTAKES = {
     "Dullin": "Daulton",
     "Wheel":"Will",
     "Friday":"Freddy",
-    "Party":"Freddy"
+    "Party":"Freddy",
+    "Show Hey": "Shohei",
+    "Bow": "Bo",
+    "Boat": "Bo",
+    "We'll": "Will",
+    "One-out":"One out"
+    
 }
 
 

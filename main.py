@@ -37,13 +37,14 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["output.mp3","output1.mp3"]
+play_files = ["play1.mp3","play2.mp3","play3.mp3","play4.mp3","play5.mp3","play6.mp3","play7.mp3","play8.mp3"]
 
 # Storage lists for outputs
 all_game_states = []
 all_transcripts = []
 initial_transcripts = []
 # Process each audio file
+
 for plays in play_files:
     # Step 1: Transcribe audio to text using Whisper
     

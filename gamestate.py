@@ -294,16 +294,11 @@ class GameState:
         return "\n".join(preview)
 
     def _apply_home_run(self, play: Play):
-        """Score batter + all runners on base"""
-        runs_to_score = 1  # Batter scores
-        for base in ["third", "second", "first"]:
-            runner = self.bases.get_runner(base)
-            if runner:
-                runs_to_score += 1
-                self.bases.clear_base(base)
+        self.bases.clear()
+        self.reset_count()
         self.away_score = play.away_score_snapshot
         self.home_score = play.home_score_snapshot
-        self.reset_count()
+
 
     def _apply_runner_movements(self, play: Play):
         """Apply all runner movements from play"""
@@ -362,6 +357,7 @@ class GameState:
         # Record the play in the game history for tracking and undo functionality.
 
         # Handle pitch-type plays (don't end at-bat)
+        '''
         if play.play_type in ["ball", "called_strike", "swinging_strike", "foul"]:
             # If the play is just a pitch, process it and exit.
             
@@ -382,6 +378,7 @@ class GameState:
                 
             return
             # Exit the update method; no further state changes (bases, outs) are needed for a simple pitch.
+        '''
 
         # Handle home runs specially
         if play.play_type == "home_run":
@@ -439,9 +436,12 @@ class GameState:
         # Update outs to match transcript exactly
         if play.outs_after_play is not None:
             # If the LLM provides the total number of outs after the play (preferred method for sync).
-            self.outs = play.outs_after_play
-        #else:
+            if self.outs > play.outs_after_play:
+                self.outs += 0
+            else:    
+                self.outs = play.outs_after_play
             # If the LLM only provided the number of outs made (less reliable, but needed as a fallback).
+
             #self.outs += play.outs_made 
 
         # Add runs scored from the play to the team score
@@ -467,7 +467,7 @@ class GameState:
         if self.outs >= 3:
             # If the total outs reaches 3, execute the change of sides logic.
             print("Half inning ended!")
-            self.change_sides() 
+            self.bases.clear()
             # This method (defined elsewhere) will reset outs/count, clear bases, and advance the inning number/half.
 
     def undo_last_play(self) -> bool:
