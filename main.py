@@ -37,18 +37,21 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["demo5.mp3"]
+play_files = ["output.mp3","output1.mp3"]
 
 # Storage lists for outputs
 all_game_states = []
 all_transcripts = []
+initial_transcripts = []
 # Process each audio file
 for plays in play_files:
     # Step 1: Transcribe audio to text using Whisper
+    
     transcript = transcribe_audio(plays)
-    all_transcripts.append(transcript)
+    initial_transcripts.append(transcript)
     transcript = clean_transcript(transcript)
     transcript = standardize_transcript(transcript)
+    all_transcripts.append(transcript)
 
     # Check for undo command
     if "undo" in transcript.lower():
@@ -78,11 +81,10 @@ for plays in play_files:
 
     transcript_with_context = transcript + context_info
     # Step 2: Parse transcript into structured Play object using LLM
-    print(transcript)
     play = parse_transcript(transcript)
     play = fix_play_info(play, transcript)  # Extract hit type/direction
     play = extract_bases(play, transcript)  # Extract base state
-    print(play)
+    #print(play)
  
 
     # Debug output (commented out)
@@ -95,18 +97,16 @@ for plays in play_files:
     # Step 3: Apply play to game state
     try:
         game.update(play)
-        print("Play applied successfully!")
+        print(play)
+        #print("Play applied successfully!")
         gui.refresh_after_play(play)
     except ValueError as e:
         print(f"Play validation failed: {e}")
         print("Check play")
 
     # Display current state
-    print("State of the Game: ")
+    #print("State of the Game: ")
     print(game)
-    print("\n Transcript:")
-    print(transcript)
-    print("\n")
     game_str = str(game)
     all_game_states.append(game_str)
 

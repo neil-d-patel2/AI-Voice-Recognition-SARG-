@@ -59,7 +59,12 @@ COMMON_MISTAKES = {
     "two center": "to center",
     "two right field": "to right field",
     "Ride": "Right",
-    "both third": "Bo on third"
+    "both third": "Bo on third",
+    "tingles":"singles",
+    "Dullin": "Daulton",
+    "Wheel":"Will",
+    "Friday":"Freddy",
+    "Party":"Freddy"
 }
 
 

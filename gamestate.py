@@ -301,7 +301,8 @@ class GameState:
             if runner:
                 runs_to_score += 1
                 self.bases.clear_base(base)
-        self.add_runs(runs_to_score)
+        self.away_score = play.away_score_snapshot
+        self.home_score = play.home_score_snapshot
         self.reset_count()
 
     def _apply_runner_movements(self, play: Play):
@@ -465,6 +466,7 @@ class GameState:
         # Handle half-inning change
         if self.outs >= 3:
             # If the total outs reaches 3, execute the change of sides logic.
+            print("Half inning ended!")
             self.change_sides() 
             # This method (defined elsewhere) will reset outs/count, clear bases, and advance the inning number/half.
 

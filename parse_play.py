@@ -15,7 +15,7 @@ prompt = PromptTemplate(
 {format_instructions}
 
 REQUIRED ANNOUNCEMENT FORMAT:
-ALL transcripts MUST follow this exact pattern:
+The transcript WILL contain most of the following information, but may omit Count, Base State, and Outs for short announcements like a Home Run:
 "[Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score]."
 
 CRITICAL PARSING RULES:
