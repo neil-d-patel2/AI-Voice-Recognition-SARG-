@@ -73,9 +73,9 @@ CRITICAL PARSING RULES:
    - CRITICAL: Foul balls ALWAYS outs_made = 0 (even if transcript says "2 out")
    
 6. OUTS AFTER PLAY:
-   - **CRITICAL CHANGE**: Extract the **current number of outs mentioned in the transcript**.
-   - Store it in a new field called `outs_after_play` (integer).
-   - This represents the game’s outs **after this play**, and can differ from outs_made.
+   - CRITICAL: Look for the total number of outs currently displayed in the transcript (e.g., "1 out", "2 outs", "No outs").
+   - Store this absolute number (0, 1, or 2) in the `outs_after_play` field.
+   - OMISSION: If the transcript does NOT explicitly mention the total number of outs after the play (e.g., just says "Ground ball"), you MUST **OMIT** the `outs_after_play` field from the final JSON.
    - Example: transcript says "2 out" → outs_after_play = 2
    
 7. RUNS_SCORED:

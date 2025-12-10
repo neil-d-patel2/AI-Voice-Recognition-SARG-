@@ -37,7 +37,7 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["demo1.mp3","demo2.mp3","demo3.mp3"]
+play_files = ["demo5.mp3"]
 
 # Storage lists for outputs
 all_game_states = []
@@ -78,6 +78,7 @@ for plays in play_files:
 
     transcript_with_context = transcript + context_info
     # Step 2: Parse transcript into structured Play object using LLM
+    print(transcript)
     play = parse_transcript(transcript)
     play = fix_play_info(play, transcript)  # Extract hit type/direction
     play = extract_bases(play, transcript)  # Extract base state
