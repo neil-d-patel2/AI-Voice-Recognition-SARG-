@@ -37,7 +37,7 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["output.mp3","error_fixed.mp3","output1.mp3"]
+play_files = ["demo1.mp3","demo2.mp3","demo3.mp3"]
 
 # Storage lists for outputs
 all_game_states = []
@@ -131,9 +131,9 @@ print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by
 print("=" * 60 + "\n")
 for states in all_game_states:
     print(states)
-
+print("transcript for speech recognition errors:")
 print("=============================")
-print("transcript for speech recognition errors")
+
 for transcripts in all_transcripts:
     print(transcripts)
 # Run GUI event loop

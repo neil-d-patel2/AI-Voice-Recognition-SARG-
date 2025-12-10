@@ -46,7 +46,6 @@ CRITICAL PARSING RULES:
    - Example: "count, zero one" = balls: 0, strikes: 1
 
 4. RUNNERS - THIS IS CRITICAL:
-   - **CRITICAL CONSISTENCY CHECK**: The `bases_after` snapshot MUST be an accurate reflection of the final state derived ONLY from the `runners` list. If a runner ends on a base (end_base is first, second, or third), they MUST be in `bases_after`. If a base is empty, it MUST be absent from `bases_after`.
    - ALWAYS check "Current game state" for who's on base BEFORE the play
    - For batters: ALWAYS use start_base = "none" (NEVER use "batter" or "plate")
    - For HITS: Batter goes from "none" to base (first/second/third)
