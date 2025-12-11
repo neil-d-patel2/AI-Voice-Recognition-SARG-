@@ -466,7 +466,6 @@ class GameState:
         # Handle half-inning change
         if self.outs >= 3:
             # If the total outs reaches 3, execute the change of sides logic.
-            print("Half inning ended!")
             self.bases.clear()
             # This method (defined elsewhere) will reset outs/count, clear bases, and advance the inning number/half.
 

@@ -97,8 +97,9 @@ for plays in play_files:
 
     # Step 3: Apply play to game state
     try:
-        game.update(play)
-        print(play)
+        game.update(play) 
+        print(game)
+        print("\n")
         #print("Play applied successfully!")
         gui.refresh_after_play(play)
     except ValueError as e:
@@ -107,7 +108,6 @@ for plays in play_files:
 
     # Display current state
     #print("State of the Game: ")
-    print(game)
     game_str = str(game)
     all_game_states.append(game_str)
 
@@ -131,12 +131,7 @@ print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by
 
 # Print all states and transcripts at end
 print("=" * 60 + "\n")
-for states in all_game_states:
-    print(states)
-print("transcript for speech recognition errors:")
-print("=============================")
 
-for transcripts in all_transcripts:
-    print(transcripts)
+
 # Run GUI event loop
 sys.exit(app.exec())
