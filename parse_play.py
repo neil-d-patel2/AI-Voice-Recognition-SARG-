@@ -131,7 +131,8 @@ KEY REMINDERS:
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
 
-
+#Best parameter combination we found as of now.
+#More testing could improve the output metrics in the future.
 llm = OllamaLLM(model="llama3.1", temperature=0, top_p=1, repeat_penalty=1, mirostat=0)
 
 chain = prompt | llm | parser

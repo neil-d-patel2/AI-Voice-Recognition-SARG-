@@ -155,6 +155,7 @@ def standardize_transcript(text: str) -> str:
 
     # Step 9: Replace commas with periods at major boundaries for better structure
     # After action verbs like "hits a single," -> "hits a single."
+    # This format helps the LLM parse slightly better 
     action_verbs = [
         "takes a ball",
         "swings and misses",
@@ -174,10 +175,8 @@ def standardize_transcript(text: str) -> str:
     ]
 
     for verb in action_verbs:
-        # Replace "verb," with "verb."
-        text = re.sub(rf"({re.escape(verb)})\s*,", r"\1.", text, flags=re.IGNORECASE)
+         text = re.sub(rf"({re.escape(verb)})\s*,", r"\1.", text, flags=re.IGNORECASE)
 
-    # Step 10: Capitalize first letter
     if text:
         text = text[0].upper() + text[1:]
 
@@ -185,6 +184,7 @@ def standardize_transcript(text: str) -> str:
 
 
 if __name__ == "__main__":
+    #Gen test
     test_transcripts = [
         "Marcus takes a ball, count, 1-0, bases empty, no outs, score, 0-0,",
         "DeAndre flies out to center field, Count, nil, nil, Runner on second, Sarah 2 outs, Score, 3 nil,",

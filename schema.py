@@ -6,6 +6,8 @@ BaseName = Optional[str]
 
 
 class RunnerMovement(BaseModel):
+    # VERY IMPORTANT
+    # Every time a runner moves, LLM NEEDS to record it.
     """Represents the movement of a runner during a play."""
 
     player: Optional[str] = Field(None, description="Runner name or id")
@@ -43,12 +45,11 @@ class Play(BaseModel):
 
     # Play type - what actually happened
     play_type: Literal[
-        # Individual pitch results (at_bat_complete = False)
-        "ball",  # Pitch outside zone, no swing
-        "called_strike",  # Pitch in zone, no swing
-        "swinging_strike",  # Batter swings and misses
-        "foul",  # Batter makes contact, ball goes foul
-        # Completed at-bat results (at_bat_complete = True)
+
+        "ball",  
+        "called_strike",  
+        "swinging_strike",
+        "foul",  
         "single",
         "double",
         "triple",
@@ -57,27 +58,23 @@ class Play(BaseModel):
         "fly_out",
         "line_out",
         "pop_out",
-        "strikeout",  # 3 strikes accumulated
-        "walk",  # 4 balls accumulated
+        "strikeout", 
+        "walk",
         "hit_by_pitch",
-        # Fielding plays
         "error",
         "fielder_choice",
         "double_play",
         "triple_play",
         "sac_fly",
         "sac_bunt",
-        # Baserunning plays
         "stolen_base",
         "caught_stealing",
         "pickoff",
         "wild_pitch",
         "passed_ball",
         "balk",
-        # Administrative events
         "substitution",
         "pitching_change",
-        # Other
         "in_play",
     ] = Field(
         ...,
@@ -101,6 +98,7 @@ class Play(BaseModel):
     )
 
     # Runner and scoring information
+    # Key for updating the game state after any player moves.
     runners: List[RunnerMovement] = Field(
         default_factory=list,
         description="Movements of runners on the play. Include the batter for hits.",

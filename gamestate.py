@@ -82,7 +82,8 @@ class Inning:
     """
     Manages the game state (top and bottom of innings).
     """
-
+    #Not extremely important or relevant as of now.
+    #If testing, refer to the readme for half-inning approach.
     def __init__(self):
         self.number: int = 1
         self.top: bool = True
@@ -124,7 +125,8 @@ class GameState:
     """
     Manages the overall state of a baseball game with underlying logic.
     """
-
+    #Extremely crucical for how game is stored. 
+    #Refer to the update method, most important.
     def __init__(self, home_team: str, away_team: str):
         self.home = Team(home_team)
         self.away = Team(away_team)
@@ -134,7 +136,6 @@ class GameState:
         self.balls: int = 0
         self.strikes: int = 0
         self.history: List[Play] = []
-        # Initialize scores
 
         self.home_score: int = 0
         self.away_score: int = 0
@@ -347,59 +348,25 @@ class GameState:
             play: Play object to apply, containing data parsed from the transcript.
             validate: Whether to validate play before applying (default True).
         """
+        # Check if valid play
         if validate:
             valid, error = self.validate_play(play)
             if not valid:
                 raise ValueError(f"Invalid play: {error}")
 
         self.history.append(play)
-        # Record the play in the game history for tracking and undo functionality.
-
-        # Handle pitch-type plays (don't end at-bat)
-        '''
-        if play.play_type in ["ball", "called_strike", "swinging_strike", "foul"]:
-            # If the play is just a pitch, process it and exit.
-            
-            pitch_type = play.play_type
-            event, should_continue = self.record_pitch(pitch_type, play.batter)
-            # Increment the internal self.balls/self.strikes counts.
-            # This method also checks for walks (4 balls) or strikeouts (3 strikes)
-            # based on the internal count logic.
-            
-            # Override count with transcript values if provided
-            if play.balls is not None:
-                # If the LLM provided an explicit ball count from the transcript, use it
-                # to synchronize the game state, capping it at 3 (max legal balls).
-                self.balls = min(play.balls, 3)
-            if play.strikes is not None:
-                # Same synchronization for strikes, capping it at 2 (max legal strikes before out).
-                self.strikes = min(play.strikes, 2)
-                
-            return
-            # Exit the update method; no further state changes (bases, outs) are needed for a simple pitch.
-        '''
-
-        # Handle home runs specially
+ 
         if play.play_type == "home_run":
-            # If a home run occurs, use the dedicated, robust logic.
             self._apply_home_run(play)
             return
-            # Exit, as the home run method handles runs scored, base clearing, and count reset.
         
-        # --- Base Runner Logic (Action and Persistence) ---
-        # This block was added to solve the consistency issues and replaces the flawed play.bases_after logic.
         if play.runners:
-            # We only execute this complex logic if the play included specific runner movements.
-            
-            # 1. Snapshot and Identify Movers
+            #Apply movements if LLM filled runners. 
             current_base_state = self.bases.snapshot() 
-            # Get the state before the play (the persistence source).
             moved_players = {r.player for r in play.runners if r.player}
-            # Create a set of players involved in the action.
             final_bases = {}
-            # Initialize the dictionary to build the new, correct base state.
 
-            # 2. Apply Explicit Movements (Action)
+            # 2. Apply runner Movements 
             for movement in play.runners:
                 player = movement.player
                 end = movement.end_base or "none"
@@ -408,66 +375,52 @@ class GameState:
                     # Place the moving runner on their new, final base.
                     final_bases[end] = player
             
-            # 3. Apply Persistence (Carry-Over)
+            # 3. Carry over previous batters.
             for base, player in current_base_state.items():
-                # Check all players who were on base before the play.
                 
                 if player is not None and player not in moved_players:
-                    # If the player was on base AND was not explicitly moved (persistence).
                     
                     if base not in final_bases: 
                         # They stay on their original base, but ONLY if that base 
-                        # wasn't taken by an explicit movement (like a runner advancing).
+                        # wasn't taken by another movement
                         final_bases[base] = player
 
-            # 4. Apply the Final State
             self.bases.clear()
-            # Clear all bases in the internal object.
             for base, player in final_bases.items():
                 if base in self.bases.state:
-                    # Populate the Bases object with the reconciled final state.
+                    # Populate new bases with the final state of all players.
                     self.bases.state[base] = player
 
-        # --- END Base Runner Logic ---
-        
-        # --- Outs and Score Synchronization ---
 
-        # Update outs to match transcript exactly
         if play.outs_after_play is not None:
-            # If the LLM provides the total number of outs after the play (preferred method for sync).
+            # If the LLM provides the total number of outs after the play (eg 2 outs, set that equal to the current outs)
+            # if not, keep it the same. The formatting is incorrect.
             if self.outs > play.outs_after_play:
                 self.outs += 0
             else:    
                 self.outs = play.outs_after_play
-            # If the LLM only provided the number of outs made (less reliable, but needed as a fallback).
 
-            #self.outs += play.outs_made 
 
         # Add runs scored from the play to the team score
         if play.runs_scored > 0:
-            # Add the runs counted by the LLM (from runners reaching 'home') to the batting team's score.
             self.add_runs(play.runs_scored)
 
-        # Score synchronization (from transcript snapshot)
         if (
             play.away_score_snapshot is not None
             and play.home_score_snapshot is not None
         ):
-            # If the transcript provides the absolute score snapshot, use it to ensure the score display is synchronized.
+            #If the transcript sends the score, update the game score.
             self.away_score = play.away_score_snapshot
             self.home_score = play.home_score_snapshot
 
-        # Reset count if at-bat is complete
         if play.at_bat_complete:
-            # If the play ended the plate appearance (hit, out, walk), reset balls and strikes for the next batter.
             self.reset_count()
         
         # Handle half-inning change
         if self.outs >= 3:
             # If the total outs reaches 3, execute the change of sides logic.
             self.bases.clear()
-            # This method (defined elsewhere) will reset outs/count, clear bases, and advance the inning number/half.
-
+            # Goal here is to run this system half inning by half inning.
     def undo_last_play(self) -> bool:
         """
         Undo the last play by replaying entire history without it.
