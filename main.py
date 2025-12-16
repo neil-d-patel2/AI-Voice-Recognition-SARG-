@@ -1,5 +1,4 @@
-# main.py - Entry point for SARG voice recognition baseball scorekeeping
-# to format document, use
+#main.py
 import shutil
 import os
 import subprocess
@@ -13,19 +12,10 @@ from userinterf import GameGUI, QApplication
 from urllib3.exceptions import NotOpenSSLWarning
 from fix_hit_info import fix_play_info, extract_bases
 
+#ignore unncessary warnings
+
 warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
 sys.stderr = open(os.devnull, "w")
-
-
-#eval "$(pyenv init --path)" if necessary to start the pyenv python version.
-#format "[Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score]."
-# Initialize PyQt5 application
-
-'''
-recording plays
-say "Bo Bichette walks" -o temp.aiff
-ffmpeg -i temp.aiff play1.mp3
-'''
 
 app = QApplication(sys.argv)
 
@@ -37,38 +27,32 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["play1.mp3","play2.mp3","play3.mp3","play4.mp3","play5.mp3","play6.mp3","play7.mp3","play8.mp3"]
+play_files = ["play1.mp3","play2.mp3","play3.mp3"]
 
-# Storage lists for outputs
 all_game_states = []
 all_transcripts = []
 initial_transcripts = []
-# Process each audio file
 
 for plays in play_files:
-    # Step 1: Transcribe audio to text using Whisper
-    
+    #transcribe audio 
     transcript = transcribe_audio(plays)
     initial_transcripts.append(transcript)
     transcript = clean_transcript(transcript)
     transcript = standardize_transcript(transcript)
     all_transcripts.append(transcript)
 
-    # Check for undo command
     if "undo" in transcript.lower():
-        print("🔄 UNDO command detected!")
+        print("Undo play")
         if game.undo_last_play():
-            print("Successfully undid last play")
+            print("Undid last play")
             gui.update_display()
         else:
-            print("No plays to undo")
-        continue  # Skip to next audio file
-
-    # Get current game state for context
+            print("Nothing to undo")
+        continue  
+    # add current gamestate context to transcript
     current_bases = game.bases.snapshot()
     current_count = f"{game.balls}-{game.strikes}"
     current_outs = game.outs
-    # Add context to transcript for better parsing
     context_info = (
         f"\nCurrent game state - Count: {current_count}, Outs: {current_outs}"
     )
@@ -81,57 +65,27 @@ for plays in play_files:
         context_info += ", Bases empty"
 
     transcript_with_context = transcript + context_info
+    
     # Step 2: Parse transcript into structured Play object using LLM
     play = parse_transcript(transcript)
-    play = fix_play_info(play, transcript)  # Extract hit type/direction
-    play = extract_bases(play, transcript)  # Extract base state
-    #print(play)
+    play = fix_play_info(play, transcript)  
+    play = extract_bases(play, transcript) 
+    
  
 
-    # Debug output (commented out)
-    """print(f"DEBUG Play object: {play}")
-     print(f"DEBUG Play.batter: {play.batter}")
-     print(f"DEBUG Play.play_type: {play.play_type}")
-     print(f"DEBUG Play.runners: {play.runners}")    
-     print()"""
 
-    # Step 3: Apply play to game state
     try:
         game.update(play) 
         print(game)
-        print("\n")
-        #print("Play applied successfully!")
         gui.refresh_after_play(play)
     except ValueError as e:
         print(f"Play validation failed: {e}")
-        print("Check play")
 
-    # Display current state
-    #print("State of the Game: ")
     game_str = str(game)
     all_game_states.append(game_str)
 
-# Undo testing code (commented out)
-"""print(f"\nBefore undo:")
-print(f"  State: {game}")
-print(f"  History length: {len(game.history)}")
-print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by {game.history[-1].batter if game.history else 'None'}")
-"""
-
-# Undo the last play (Tommy's strikeout)
-"""if game.undo_last_play():
-    print(f"\nAfter undo:")
-    print(f"  State: {game}")
-    print(f"  History length: {len(game.history)}")
-    print(f"  Last play: {game.history[-1].play_type if game.history else 'None'} by {game.history[-1].batter if game.history else 'None'}")
-    
-    # Refresh GUI to show the undone state
-    gui.update_display()
-"""
-
-# Print all states and transcripts at end
 print("=" * 60 + "\n")
 
 
-# Run GUI event loop
+
 sys.exit(app.exec())

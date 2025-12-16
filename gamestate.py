@@ -9,7 +9,7 @@ class BatterState:
     """
     Holds the state of the batter during an at-bat.
     """
-
+    #Currently, class is not in use. 
     def __init__(self, player_name: str):
         self.player_name = player_name
         self.strikes = 0
@@ -39,8 +39,7 @@ class BatterState:
 
 class Bases:
     """
-    Bases state management for a baseball game.
-    Updated automatically after parsing.
+    Bases state management for a baseball game, included in GameState.
     """
 
     def __init__(self):
