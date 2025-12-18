@@ -129,28 +129,6 @@ Addison singles on a line drive to left field, Ohtani to second, Addison to firs
 
 #### (Ohtani to first and Addison to first) are optional, but highly recommended.
 
-## 📁 Project Structure
-
-```
-SARG-project/
-│
-├── 🎯 main.py              # Entry point & orchestration
-├── 🎮 gamestate.py         # Core game logic
-├── 📋 schema.py            # Data models (Pydantic)
-├── 🧠 parse_play.py        # LLM play parser
-├── 🎤 speech.py            # Whisper transcription
-├── 🖥️ userinterf.py        # PyQt5 GUI
-├── 🎙️ recorder.py          # Audio utilities
-│
-├── 📖 README.md
-├── 📦 requirements.txt
-└── 📂 audio/
-    ├── play1.mp3
-    ├── play2.mp3
-    └── ...
-```
-
----
 
 ### The Pipeline
 
@@ -190,28 +168,15 @@ SARG-project/
 
 ---
 
-## 🧪 Testing
 
-### Run Test Sequences
-
-```python
-# Complete half-inning test (12 plays)
-play_files = [f"test_play{i}.mp3" for i in range(1, 13)]
-python3 main.py
-
-# Expected final state:
-# AWAY: 3 | HOME: 0 | Inning: Bottom 1, Count: 0-0, Outs: 0
-```
-
-
-## 📊 Performance Metrics
+## 📊 Performance Metrics (Depends on local hardware due to Ollama. Beware running large amounts of plays.)
 
 | Operation | Time | Technology |
 |-----------|------|------------|
-| 🎤 **Transcription** | 2-5s | Whisper (base) |
-| 🧠 **Parsing** | 1-3s | llama3.1 |
-| ⚡ **State Update** | <0.1s | Python |
-| **Total** | **3-8s per play** | - |
+| 🎤 **Transcription** | 2-5s |
+| 🧠 **Parsing** | 1-3s |
+| ⚡ **State Update** | <0.1s |
+| **Total** | **3-8s per play** |
 
 ---
 
