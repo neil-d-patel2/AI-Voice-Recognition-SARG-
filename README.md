@@ -27,7 +27,7 @@ AIVR changes the way baseball games are scored by allowing scorekeepers to proce
 - 🤖 LLM-based natural language parsing
 - 🖥️ Live GUI after each run 
 - 📝 JSON persistence
-- 🔙 Multi-level undo system
+- 🔙 Undo system
 
 </td>
 </tr>
@@ -128,6 +128,8 @@ Ohtani singles on a line drive to left field. Ohtani to first.
 Addison singles on a line drive to left field, Ohtani to second, Addison to first.
 
 #### (Ohtani to first and Addison to first) are optional, but highly recommended.
+
+#### (If you want to undo plays, simply record a mp3 file and say "Undo")
 
 
 ### The Pipeline
