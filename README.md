@@ -115,9 +115,6 @@ python3 main.py
 
 ### 🎙️ Announcement Format
 
-For best results, follow this structure:
-
-
 #### Examples (More ambiguity coming soon)
 
 For best results, follow MLB Gameday structure:
@@ -128,7 +125,9 @@ Eg:
 
 Ohtani singles on a line drive to left field. Ohtani to first.
 
-Ohtani to first is optional, but highly recommended.
+Addison singles on a line drive to left field, Ohtani to second, Addison to first.
+
+#### (Ohtani to first and Addison to first) are optional, but highly recommended.
 
 ## 📁 Project Structure
 
