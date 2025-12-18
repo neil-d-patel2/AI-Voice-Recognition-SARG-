@@ -6,7 +6,8 @@ from langchain.prompts import PromptTemplate
 from schema import Play
 from pydantic import BaseModel
 
-# Build parser bound to the Pydantic model
+#Parse is resticted to a "Play"
+#Created to include data needed for gamestate management
 parser = PydanticOutputParser(pydantic_object=Play)
 
 prompt = PromptTemplate(
@@ -131,8 +132,7 @@ KEY REMINDERS:
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
 
-#Best parameter combination we found as of now.
-#More testing could improve the output metrics in the future.
+#Best parameter combination found as of now.
 llm = OllamaLLM(model="llama3.1", temperature=0, top_p=1, repeat_penalty=1, mirostat=0)
 
 chain = prompt | llm | parser
@@ -143,7 +143,6 @@ def parse_transcript(transcript_text: str):
     return result
 
 
-# Example use
 if __name__ == "__main__":
     t = "Neil swings and misses. Count: 1-2. Bases empty. No outs. Score: 0-0."
     play = parse_transcript(t)

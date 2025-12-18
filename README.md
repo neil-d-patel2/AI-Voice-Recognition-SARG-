@@ -6,10 +6,6 @@
 
 *A voice-activated baseball scorekeeping system powered by AI*
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: Educational](https://img.shields.io/badge/license-Educational-green.svg)](LICENSE)
-[![Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)](https://github.com)
-
 [Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture) • [Contributing](#-contributing)
 
 ---
@@ -18,24 +14,12 @@
 
 ## 🎯 What is AI VR?
 
-AIVR transforms the way baseball games are scored by combining **speech recognition** and **natural language processing** to automatically track every play, every out, every run—all from voice announcements.
-
-Simply speak the play, and we does the rest.
+AIVR changes the way baseball games are scored by allowing scorekeepers to process and record plays in the most natural way, speech!
 
 ## 🌟 Features
 
 <table>
 <tr>
-<td width="50%">
-
-### Core Tracking
-- ✅ Balls, strikes, and outs
-- ✅ Base runners and scoring
-- ✅ Inning progression
-- ✅ Complete play history
-- ✅ All play types supported
-
-</td>
 <td width="50%">
 
 ### Features
@@ -89,7 +73,7 @@ graph TB
 
 Before you begin, ensure you have:
 
-- 🐍 **Python 3.9+**
+- 🐍 **Python 3.9** (can use pyenv for this if necessary)
 - 🎬 **ffmpeg** (for audio processing)
 - 🦙 **Ollama** with llama3.1 model
 
@@ -102,14 +86,13 @@ cd SARG-project
 # 2️⃣ Install Python dependencies
 pip install -r requirements.txt
 
-# 3️⃣ Install Ollama (macOS example)
-brew install ollama
+# 3️⃣ Ensure ollama is installed, and run in a separate terminal.
 ollama serve
-ollama pull llama3.1
+
 
 # 4️⃣ Install ffmpeg
-brew install ffmpeg  # macOS
-# sudo apt-get install ffmpeg  # Linux
+brew install ffmpeg 
+
 ```
 
 > 💡 **Windows Users**: Download ffmpeg from [ffmpeg.org](https://ffmpeg.org/download.html)

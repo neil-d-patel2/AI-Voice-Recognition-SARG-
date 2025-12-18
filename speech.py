@@ -184,11 +184,9 @@ def standardize_transcript(text: str) -> str:
 
 
 if __name__ == "__main__":
-    #Gen test
     test_transcripts = [
-        "Marcus takes a ball, count, 1-0, bases empty, no outs, score, 0-0,",
-        "DeAndre flies out to center field, Count, nil, nil, Runner on second, Sarah 2 outs, Score, 3 nil,",
-        "Rodriguez draws a walk, count, nil nil, runner on first, Rodriguez one out, score, 2 nil,",
+        #  Prior format:
+        # "Marcus takes a ball, count, 1-0, bases empty, no outs, score, 0-0,"
     ]
 
     print("Testing standardization:")
