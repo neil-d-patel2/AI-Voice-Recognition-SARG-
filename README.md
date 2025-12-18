@@ -104,7 +104,7 @@ brew install ffmpeg
 ### Basic Workflow
 
 ```python
-# 1. Prepare your audio files
+# 1. Prepare your audio files (Record using ffmpeg)
 play_files = ["play1.mp3", "play2.mp3", "play3.mp3"]
 
 # 2. Run the program
@@ -117,21 +117,18 @@ python3 main.py
 
 For best results, follow this structure:
 
-```
-[Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score].
-```
 
 #### Examples (More ambiguity coming soon)
 
-| Play Type | Announcement |
-|-----------|-------------|
-| **Ball** | `Marcus takes a ball. Count: 1-0. Bases empty. No outs. Score: 0-0.` |
-| **Home Run** | `Jessica hits a home run. Count: 0-0. Bases empty. No outs. Score: 2-0.` |
-| **Ground Out** | `Chen grounds out to shortstop. Count: 0-0. Bases empty. 1 out. Score: 2-0.` |
-| **Double** | `Sarah doubles to left field. Count: 2-1. Runner on first. 1 out. Score: 3-1.` |
+For best results, follow MLB Gameday structure:
 
+Pair with batter movements for improved accuracy
 
----
+Eg:
+
+Ohtani singles on a line drive to left field. Ohtani to first.
+
+Ohtani to first is optional, but highly recommended.
 
 ## 📁 Project Structure
 
