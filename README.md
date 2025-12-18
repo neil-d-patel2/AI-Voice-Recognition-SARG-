@@ -6,7 +6,7 @@
 
 *A voice-activated baseball scorekeeping system powered by AI*
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture) • [Contributing](#-contributing)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture)
 
 ---
 
