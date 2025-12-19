@@ -12,11 +12,6 @@ venv/
 env/
 ENV/
 
-s5/
-s4/
-s3/
-s1/
-
 .vscode/
 .idea/
 .DS_Store
