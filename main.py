@@ -84,5 +84,5 @@ for plays in play_files:
 print("=" * 60 + "\n")
 
 
-
+# exit 
 sys.exit(app.exec())
