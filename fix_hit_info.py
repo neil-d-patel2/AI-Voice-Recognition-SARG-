@@ -50,9 +50,9 @@ def fix_play_info(play: Play, transcript: str) -> Play:
     for keyword, pt in play_type_map:
         if keyword in transcript_lower:
             play.play_type = pt
-            break  # Stop at first match
+            break  
 
-    # --------- 2. Hit type ----------
+    # update hit type if detected
     if "ground ball" in transcript_lower:
         play.hit_type = "ground_ball"
     elif "fly ball" in transcript_lower:
@@ -66,7 +66,7 @@ def fix_play_info(play: Play, transcript: str) -> Play:
     else:
         play.hit_type = play.hit_type or None
 
-    # --------- 3. Hit direction ----------
+    # Update hit direction if detected
     direction_map = {
         "shortstop": "ss",
         "second base": "2b",
@@ -84,7 +84,7 @@ def fix_play_info(play: Play, transcript: str) -> Play:
             play.hit_direction = abbr
             break
 
-    # --------- 4. Clear runners if Bases empty ----------
+   
     if "empty" in transcript_lower:
         play.runners = []
         play.batter = None
