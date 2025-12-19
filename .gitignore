@@ -7,12 +7,16 @@ __pycache__/*
 .Python
 
 
-# Virtual environments
+
 venv/
 env/
 ENV/
 
-# IDE settings
+s5/
+s4/
+s3/
+s1/
+
 .vscode/
 .idea/
 .DS_Store
