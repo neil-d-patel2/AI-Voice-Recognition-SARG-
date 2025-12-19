@@ -32,7 +32,7 @@ class Play(BaseModel):
     home_score_snapshot: Optional[int] = Field(
         None, description="The home team's score extracted directly from the transcript, if mentioned."
     )
-    # Hit contact information
+    
     hit_type: Optional[
         Literal["ground_ball", "fly_ball", "line_drive", "popup", "bunt", "fly out"]
     ] = Field(
@@ -43,7 +43,7 @@ class Play(BaseModel):
         None, description="Direction of hit (e.g., 'to shortstop', 'to center field')"
     )
 
-    # Play type - what actually happened
+    # Play type - what actually happened in the play
     play_type: Literal[
 
         "ball",  
@@ -98,7 +98,6 @@ class Play(BaseModel):
     )
 
     # Runner and scoring information
-    # Key for updating the game state after any player moves.
     runners: List[RunnerMovement] = Field(
         default_factory=list,
         description="Movements of runners on the play. Include the batter for hits.",
@@ -135,6 +134,7 @@ class Play(BaseModel):
     )
     outs_after_play: Optional[int] = None
 
+    ''' Example Plays for API Endpoint
     class Config:
         """Pydantic configuration with examples"""
 
@@ -217,3 +217,4 @@ class Play(BaseModel):
                 },
             ]
         }
+        '''

@@ -71,9 +71,6 @@ for plays in play_files:
     play = fix_play_info(play, transcript)  
     play = extract_bases(play, transcript) 
     
- 
-
-
     try:
         game.update(play) 
         print(game)

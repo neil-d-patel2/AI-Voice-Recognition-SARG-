@@ -16,7 +16,7 @@ prompt = PromptTemplate(
 {format_instructions}
 
 REQUIRED ANNOUNCEMENT FORMAT:
-The transcript WILL contain most of the following information, but may omit Count, Base State, and Outs for short announcements like a Home Run:
+The transcript WILL contain most of the following information, but may omit Count, Base State, and Outs for some announcements.
 "[Batter Name] [Action]. Count: [Balls]-[Strikes]. [Base State]. [Outs]. [Score]."
 
 CRITICAL PARSING RULES:
@@ -54,10 +54,10 @@ CRITICAL PARSING RULES:
    - For batters: ALWAYS use start_base = "none" (NEVER use "batter" or "plate")
    - For HITS: Batter goes from "none" to base (first/second/third)
    - For HITS with runners: Advance runners based on hit type:
-     * Single: runners advance 1 base (first→second, second→third, third→home)
-     * Double: runners advance 2+ bases (first→third or home, second→home, third→home)
-     * Triple: ALL runners score (→home)
-     * Home run: ALL runners score including batter (→home)
+   * Single: runners advance 1 base (first→second, second→third, third→home)
+   * Double: runners advance 2+ bases (first→third or home, second→home, third→home)
+   * Triple: ALL runners score (→home)
+   * Home run: ALL runners score including batter (→home)
    - For WALKS: Batter to first (none→first)
    - For DOUBLE PLAYS:
     * MUST have outs_made = 2
