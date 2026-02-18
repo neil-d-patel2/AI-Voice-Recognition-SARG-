@@ -31,7 +31,6 @@ parse_play
 *.ipynb_checkpoints
 
 #recorder.py (currently unused)
-recorder.py
 
 # Logs and databases
 *.log

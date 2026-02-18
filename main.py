@@ -27,7 +27,7 @@ gui = GameGUI(game)
 gui.show()
 
 # Audio files to process
-play_files = ["play1.mp3","play2.mp3","play3.mp3"]
+play_files = ["demo1.mp3","demo2.mp3","demo3.mp3","demo4.mp3"]
 
 all_game_states = []
 all_transcripts = []
